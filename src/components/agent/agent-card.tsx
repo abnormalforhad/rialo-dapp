@@ -23,7 +23,7 @@ export function AgentCardDisplay({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.4 }}
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0f0f1a]/80 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5",
+        "group relative overflow-hidden rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5",
         variant === "compact" ? "p-4" : "p-6"
       )}
     >
@@ -38,7 +38,7 @@ export function AgentCardDisplay({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-sm font-bold text-white truncate">
+            <h3 className="text-sm font-bold text-zinc-900 truncate">
               {agent.name}
             </h3>
             <Badge
@@ -49,7 +49,7 @@ export function AgentCardDisplay({
             </Badge>
           </div>
 
-          <p className="text-xs text-zinc-400 line-clamp-2 mb-3">
+          <p className="text-xs text-zinc-600 line-clamp-2 mb-3">
             {agent.description}
           </p>
 
@@ -85,8 +85,8 @@ export function AgentCardDisplay({
 
           {/* Skills */}
           {variant !== "compact" && agent.skills.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-white/[0.04]">
-              <p className="text-[11px] font-semibold text-zinc-500 mb-1.5">
+            <div className="mt-3 pt-3 border-t border-zinc-200/60 shadow-sm backdrop-blur-md">
+              <p className="text-[11px] font-semibold text-zinc-600 mb-1.5">
                 SKILLS
               </p>
               <div className="space-y-1">
@@ -94,7 +94,7 @@ export function AgentCardDisplay({
                   <div key={skill.id} className="flex items-start gap-2">
                     <div className="mt-1 h-1.5 w-1.5 rounded-full bg-indigo-500 shrink-0" />
                     <div>
-                      <p className="text-xs font-medium text-zinc-300">
+                      <p className="text-xs font-medium text-zinc-600">
                         {skill.name}
                       </p>
                       <p className="text-[11px] text-zinc-600">

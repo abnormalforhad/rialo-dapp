@@ -81,14 +81,14 @@ export default function LandingPage() {
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-              <span className="text-white">Autonomous AI</span>
+              <span className="text-zinc-900">Autonomous AI</span>
               <br />
               <span className="text-gradient from-indigo-400 via-purple-400 to-pink-400">
                 Agent Coordination
               </span>
             </h1>
 
-            <p className="mx-auto max-w-2xl text-lg md:text-xl text-zinc-400 mb-10 leading-relaxed">
+            <p className="mx-auto max-w-2xl text-lg md:text-xl text-zinc-600 mb-10 leading-relaxed">
               AI agents negotiate tasks, lock funds in escrow, and settle
               payments autonomously — all verified by Judge AI through{" "}
               <span className="text-indigo-400 font-medium">
@@ -102,7 +102,7 @@ export default function LandingPage() {
               <Link href="/dashboard">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0 shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all h-12 px-8 text-base font-semibold"
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-zinc-900 border-0 shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all h-12 px-8 text-base font-semibold"
                 >
                   <Zap className="mr-2 h-5 w-5" />
                   Launch Dashboard
@@ -113,7 +113,7 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white/10 text-zinc-300 hover:bg-white/5 hover:text-white h-12 px-8 text-base"
+                  className="border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-600 hover:bg-zinc-100/50 hover:text-zinc-900 h-12 px-8 text-base"
                 >
                   <Bot className="mr-2 h-5 w-5" />
                   Create AI Task
@@ -125,7 +125,7 @@ export default function LandingPage() {
       </section>
 
       {/* Stats bar */}
-      <section className="relative border-y border-white/[0.06] bg-white/[0.02]">
+      <section className="relative border-y border-zinc-200/60 shadow-sm backdrop-blur-md bg-white/60">
         <div className="mx-auto max-w-6xl px-4 py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {STATS.map((stat, i) => (
@@ -136,10 +136,10 @@ export default function LandingPage() {
                 transition={{ delay: 0.2 + i * 0.1, duration: 0.5 }}
                 className="text-center"
               >
-                <p className="text-2xl md:text-3xl font-bold text-white">
+                <p className="text-2xl md:text-3xl font-bold text-zinc-900">
                   {stat.value}
                 </p>
-                <p className="text-sm text-zinc-500 mt-1">{stat.label}</p>
+                <p className="text-sm text-zinc-600 mt-1">{stat.label}</p>
               </motion.div>
             ))}
           </div>
@@ -155,10 +155,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">
               Powered by Rialo&apos;s Native Primitives
             </h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto">
+            <p className="text-zinc-600 max-w-2xl mx-auto">
               No oracles. No keepers. No middleware. Smart contracts interact
               directly with the real world.
             </p>
@@ -172,20 +172,20 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0b0b16]/80 p-6 hover:border-white/10 transition-all duration-300"
+                className="group relative overflow-hidden rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass p-6 hover:border-zinc-200/60 shadow-sm backdrop-blur-md transition-all duration-300"
               >
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div
                   className={`inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.gradient} shadow-lg mb-4`}
                 >
-                  <feature.icon className="h-5 w-5 text-white" />
+                  <feature.icon className="h-5 w-5 text-zinc-900" />
                 </div>
 
-                <h3 className="text-lg font-bold text-white mb-2">
+                <h3 className="text-lg font-bold text-zinc-900 mb-2">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
+                <p className="text-sm text-zinc-600 leading-relaxed">
                   {feature.description}
                 </p>
               </motion.div>
@@ -195,7 +195,7 @@ export default function LandingPage() {
       </section>
 
       {/* Flow diagram section */}
-      <section className="relative px-4 py-20 border-t border-white/[0.06]">
+      <section className="relative px-4 py-20 border-t border-zinc-200/60 shadow-sm backdrop-blur-md">
         <div className="mx-auto max-w-4xl">
           <motion.div
             initial={{ opacity: 0 }}
@@ -203,10 +203,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="text-center mb-14"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">
               How It Works
             </h2>
-            <p className="text-zinc-400">
+            <p className="text-zinc-600">
               End-to-end autonomous workflow in four steps
             </p>
           </motion.div>
@@ -248,19 +248,19 @@ export default function LandingPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15, duration: 0.5 }}
-                className="flex items-center gap-5 rounded-2xl border border-white/[0.06] bg-[#0b0b16]/60 p-5 hover:border-white/10 transition-all"
+                className="flex items-center gap-5 rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass p-5 hover:border-zinc-200/60 shadow-sm backdrop-blur-md transition-all"
               >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/[0.04] border border-white/[0.06]">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/60 border border-zinc-200/60 shadow-sm backdrop-blur-md">
                   <span className="text-xl font-bold text-gradient from-indigo-400 to-purple-400">
                     {item.step}
                   </span>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
                     <item.icon className="h-4 w-4 text-indigo-400" />
                     {item.title}
                   </h3>
-                  <p className="text-sm text-zinc-500 mt-0.5">{item.desc}</p>
+                  <p className="text-sm text-zinc-600 mt-0.5">{item.desc}</p>
                 </div>
                 <ChevronRight className="h-5 w-5 text-zinc-700 shrink-0" />
               </motion.div>
@@ -270,7 +270,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative px-4 py-20 border-t border-white/[0.06]">
+      <section className="relative px-4 py-20 border-t border-zinc-200/60 shadow-sm backdrop-blur-md">
         <div className="mx-auto max-w-3xl text-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -278,16 +278,16 @@ export default function LandingPage() {
             viewport={{ once: true }}
             className="rounded-3xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/15 p-10"
           >
-            <h2 className="text-3xl font-bold text-white mb-3">
+            <h2 className="text-3xl font-bold text-zinc-900 mb-3">
               Ready to Coordinate?
             </h2>
-            <p className="text-zinc-400 mb-8">
+            <p className="text-zinc-600 mb-8">
               Deploy your first AI agent task on the Rialo blockchain today.
             </p>
             <Link href="/dashboard">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0 shadow-xl shadow-indigo-500/25 h-12 px-10 text-base font-semibold"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-zinc-900 border-0 shadow-xl shadow-indigo-500/25 h-12 px-10 text-base font-semibold"
               >
                 <Zap className="mr-2 h-5 w-5" />
                 Get Started
@@ -298,13 +298,13 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.06] px-4 py-8">
+      <footer className="border-t border-zinc-200/60 shadow-sm backdrop-blur-md px-4 py-8">
         <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600">
-              <Zap className="h-4 w-4 text-white" />
+              <Zap className="h-4 w-4 text-zinc-900" />
             </div>
-            <span className="text-sm font-semibold text-zinc-400">
+            <span className="text-sm font-semibold text-zinc-600">
               RialoAgent
             </span>
           </div>

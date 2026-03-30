@@ -116,18 +116,18 @@ const stepColors = {
     line: "bg-emerald-500",
     dot: "bg-emerald-500 shadow-emerald-500/50",
     text: "text-emerald-400",
-    desc: "text-zinc-400",
+    desc: "text-zinc-600",
   },
   active: {
     line: "bg-indigo-500/30",
     dot: "bg-indigo-500 shadow-indigo-500/50",
-    text: "text-white",
+    text: "text-zinc-900",
     desc: "text-indigo-300",
   },
   pending: {
     line: "bg-zinc-700",
     dot: "bg-zinc-700",
-    text: "text-zinc-500",
+    text: "text-zinc-600",
     desc: "text-zinc-600",
   },
   failed: {
@@ -165,13 +165,13 @@ export function TaskTimeline({ escrow }: TaskTimelineProps) {
                 )}
               >
                 {step.status === "active" ? (
-                  <Loader2 className="h-4 w-4 text-white animate-spin" />
+                  <Loader2 className="h-4 w-4 text-zinc-900 animate-spin" />
                 ) : step.status === "completed" ? (
-                  <CheckCircle2 className="h-4 w-4 text-white" />
+                  <CheckCircle2 className="h-4 w-4 text-zinc-900" />
                 ) : step.status === "failed" ? (
-                  <XCircle className="h-4 w-4 text-white" />
+                  <XCircle className="h-4 w-4 text-zinc-900" />
                 ) : (
-                  <Circle className="h-4 w-4 text-zinc-500" />
+                  <Circle className="h-4 w-4 text-zinc-600" />
                 )}
               </div>
               {!isLast && (

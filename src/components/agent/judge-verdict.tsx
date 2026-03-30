@@ -28,13 +28,13 @@ export function JudgeVerdict({ escrow }: JudgeVerdictProps) {
 
   if (isPending) {
     return (
-      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+      <div className="rounded-xl border border-zinc-200/60 shadow-sm backdrop-blur-md bg-white/60 p-5">
         <div className="flex items-center gap-3 mb-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-500/10">
-            <Gavel className="h-5 w-5 text-zinc-500" />
+            <Gavel className="h-5 w-5 text-zinc-600" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-zinc-400">
+            <p className="text-sm font-semibold text-zinc-600">
               Judge AI Pending
             </p>
             <p className="text-xs text-zinc-600">
@@ -55,7 +55,7 @@ export function JudgeVerdict({ escrow }: JudgeVerdictProps) {
             <div className="absolute inset-0 rounded-xl border border-purple-500/30 animate-pulse" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-white">
+            <p className="text-sm font-semibold text-zinc-900">
               Judge AI Evaluating
             </p>
             <p className="text-xs text-purple-300">
@@ -121,7 +121,7 @@ export function JudgeVerdict({ escrow }: JudgeVerdictProps) {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-semibold text-zinc-900">
                 Verdict: {passed ? "APPROVED" : "REJECTED"}
               </p>
               <Badge
@@ -136,7 +136,7 @@ export function JudgeVerdict({ escrow }: JudgeVerdictProps) {
                 {passed ? "PASS" : "FAIL"}
               </Badge>
             </div>
-            <p className="text-xs text-zinc-400 flex items-center gap-1 mt-0.5">
+            <p className="text-xs text-zinc-600 flex items-center gap-1 mt-0.5">
               <Shield className="h-3 w-3" />
               Verified via A2A Protocol
             </p>
@@ -145,10 +145,10 @@ export function JudgeVerdict({ escrow }: JudgeVerdictProps) {
 
         {escrow.judgeReasoning && (
           <div className="rounded-lg bg-black/20 p-3">
-            <p className="text-[11px] font-semibold text-zinc-500 mb-1">
+            <p className="text-[11px] font-semibold text-zinc-600 mb-1">
               REASONING
             </p>
-            <p className="text-sm text-zinc-300 leading-relaxed">
+            <p className="text-sm text-zinc-600 leading-relaxed">
               {escrow.judgeReasoning}
             </p>
           </div>

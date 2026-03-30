@@ -50,11 +50,11 @@ export default function TasksPage() {
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-zinc-900 flex items-center gap-2">
             <ListChecks className="h-6 w-6 text-indigo-400" />
             Agent Tasks
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-zinc-600 mt-1">
             {escrows.length} total tasks · {filteredEscrows.length} shown
           </p>
         </div>
@@ -68,12 +68,12 @@ export default function TasksPage() {
         className="flex flex-col sm:flex-row gap-4"
       >
         <Tabs value={filter} onValueChange={setFilter} className="w-full sm:w-auto">
-          <TabsList className="bg-white/5 border border-white/[0.06] h-9">
+          <TabsList className="bg-white/60 border border-zinc-200/60 shadow-sm backdrop-blur-md h-9">
             {FILTER_TABS.map((tab) => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="text-xs data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-300 text-zinc-500"
+                className="text-xs data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-300 text-zinc-600"
               >
                 {tab.label}
               </TabsTrigger>
@@ -87,7 +87,7 @@ export default function TasksPage() {
             placeholder="Search tasks..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 bg-white/5 border-white/[0.06] text-white placeholder:text-zinc-600 h-9 text-sm"
+            className="pl-9 bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 h-9 text-sm"
           />
         </div>
       </motion.div>
@@ -103,10 +103,10 @@ export default function TasksPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-12 text-center"
+          className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md bg-white/60 p-12 text-center"
         >
           <SlidersHorizontal className="h-8 w-8 text-zinc-600 mx-auto mb-3" />
-          <p className="text-sm text-zinc-500 mb-1">No tasks found</p>
+          <p className="text-sm text-zinc-600 mb-1">No tasks found</p>
           <p className="text-xs text-zinc-600">
             {search ? "Try adjusting your search" : "No tasks match this filter"}
           </p>

@@ -87,10 +87,10 @@ export function TaskCreationForm() {
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20">
           <CheckCircle2 className="h-8 w-8 text-emerald-400" />
         </div>
-        <h3 className="text-xl font-bold text-white mb-2">
+        <h3 className="text-xl font-bold text-zinc-900 mb-2">
           Task Created Successfully!
         </h3>
-        <p className="text-sm text-zinc-400">
+        <p className="text-sm text-zinc-600">
           Escrow funded. Redirecting to task details...
         </p>
       </motion.div>
@@ -111,7 +111,7 @@ export function TaskCreationForm() {
           onChange={(e) => setForm({ ...form, promptText: e.target.value })}
           required
           rows={4}
-          className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 focus:border-indigo-500/50 focus:ring-indigo-500/20 resize-none"
+          className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500/50 focus:ring-indigo-500/20 resize-none"
         />
         <p className="text-xs text-zinc-600">
           Be specific — the Judge AI evaluates work against these exact requirements.
@@ -130,7 +130,7 @@ export function TaskCreationForm() {
             value={form.performer}
             onChange={(e) => setForm({ ...form, performer: e.target.value })}
             required
-            className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 font-mono text-sm focus:border-indigo-500/50"
+            className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 font-mono text-sm focus:border-indigo-500/50"
           />
         </div>
 
@@ -147,7 +147,7 @@ export function TaskCreationForm() {
             value={form.amount}
             onChange={(e) => setForm({ ...form, amount: e.target.value })}
             required
-            className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 focus:border-indigo-500/50"
+            className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500/50"
           />
         </div>
       </div>
@@ -163,15 +163,15 @@ export function TaskCreationForm() {
             value={form.deadlineSeconds}
             onValueChange={(v) => v && setForm({ ...form, deadlineSeconds: v })}
           >
-            <SelectTrigger className="bg-white/5 border-white/10 text-white focus:border-indigo-500/50">
+            <SelectTrigger className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 focus:border-indigo-500/50">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-[#141420] border-white/10">
+            <SelectContent className="bg-white shadow-xl border-zinc-200/60 shadow-sm backdrop-blur-md">
               {DEADLINE_OPTIONS.map((opt) => (
                 <SelectItem
                   key={opt.value}
                   value={opt.value}
-                  className="text-zinc-200 focus:bg-indigo-500/20 focus:text-white"
+                  className="text-zinc-200 focus:bg-indigo-500/20 focus:text-zinc-900"
                 >
                   {opt.label}
                 </SelectItem>
@@ -194,7 +194,7 @@ export function TaskCreationForm() {
             onChange={(e) =>
               setForm({ ...form, judgeEndpoint: e.target.value })
             }
-            className="bg-white/5 border-white/10 text-white placeholder:text-zinc-600 font-mono text-sm focus:border-indigo-500/50"
+            className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 font-mono text-sm focus:border-indigo-500/50"
           />
         </div>
       </div>
@@ -211,20 +211,20 @@ export function TaskCreationForm() {
           </h4>
           <div className="space-y-1.5 text-sm">
             <div className="flex justify-between">
-              <span className="text-zinc-500">Escrow Amount</span>
-              <span className="text-white font-medium">
+              <span className="text-zinc-600">Escrow Amount</span>
+              <span className="text-zinc-900 font-medium">
                 {form.amount} RIALO
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-zinc-500">Performer</span>
-              <span className="text-zinc-300 font-mono text-xs">
+              <span className="text-zinc-600">Performer</span>
+              <span className="text-zinc-600 font-mono text-xs">
                 {form.performer.slice(0, 12)}...
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-zinc-500">Deadline</span>
-              <span className="text-zinc-300">
+              <span className="text-zinc-600">Deadline</span>
+              <span className="text-zinc-600">
                 {DEADLINE_OPTIONS.find(
                   (o) => o.value === form.deadlineSeconds
                 )?.label}
@@ -239,7 +239,7 @@ export function TaskCreationForm() {
         <Button
           type="submit"
           disabled={loading || !form.promptText || !form.performer || !form.amount}
-          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all h-12 text-base font-semibold"
+          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-zinc-900 border-0 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all h-12 text-base font-semibold"
         >
           {loading ? (
             <>
@@ -265,7 +265,7 @@ export function TaskCreationForm() {
               alert("Please click the Top Right Wallet Connect button!");
             }
           }}
-          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0 h-12 text-base font-semibold"
+          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-zinc-900 border-0 h-12 text-base font-semibold"
         >
           Connect Wallet to Continue
         </Button>

@@ -19,7 +19,7 @@ export function CountdownTimer({ deadline, compact = false }: CountdownTimerProp
         className={cn(
           "text-sm font-medium",
           isExpired
-            ? "text-zinc-500"
+            ? "text-zinc-600"
             : isUrgent
               ? "text-red-400 animate-pulse"
               : "text-zinc-200"
@@ -33,10 +33,10 @@ export function CountdownTimer({ deadline, compact = false }: CountdownTimerProp
   if (isExpired) {
     return (
       <div className="flex items-center gap-2 rounded-xl bg-zinc-500/10 border border-zinc-500/20 px-4 py-3">
-        <AlertTriangle className="h-5 w-5 text-zinc-400" />
+        <AlertTriangle className="h-5 w-5 text-zinc-600" />
         <div>
-          <p className="text-sm font-semibold text-zinc-400">Deadline Expired</p>
-          <p className="text-xs text-zinc-500">Timer has been triggered</p>
+          <p className="text-sm font-semibold text-zinc-600">Deadline Expired</p>
+          <p className="text-xs text-zinc-600">Timer has been triggered</p>
         </div>
       </div>
     );
@@ -72,9 +72,9 @@ export function CountdownTimer({ deadline, compact = false }: CountdownTimerProp
           <TimeBlock value={days} label="D" urgent={isUrgent} />
         )}
         <TimeBlock value={hours} label="H" urgent={isUrgent} />
-        <span className={cn("text-lg font-bold", isUrgent ? "text-red-400" : "text-zinc-400")}>:</span>
+        <span className={cn("text-lg font-bold", isUrgent ? "text-red-400" : "text-zinc-600")}>:</span>
         <TimeBlock value={minutes} label="M" urgent={isUrgent} />
-        <span className={cn("text-lg font-bold", isUrgent ? "text-red-400" : "text-zinc-400")}>:</span>
+        <span className={cn("text-lg font-bold", isUrgent ? "text-red-400" : "text-zinc-600")}>:</span>
         <TimeBlock value={seconds} label="S" urgent={isUrgent} />
       </div>
     </div>
@@ -95,12 +95,12 @@ function TimeBlock({
       <span
         className={cn(
           "text-2xl font-bold font-mono tabular-nums leading-none",
-          urgent ? "text-red-400" : "text-white"
+          urgent ? "text-red-400" : "text-zinc-900"
         )}
       >
         {String(value).padStart(2, "0")}
       </span>
-      <span className="text-[10px] text-zinc-500 mt-0.5">{label}</span>
+      <span className="text-[10px] text-zinc-600 mt-0.5">{label}</span>
     </div>
   );
 }

@@ -177,11 +177,11 @@ export default function AgentsPage() {
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-zinc-900 flex items-center gap-2">
             <Bot className="h-6 w-6 text-indigo-400" />
             AI Agents
           </h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-zinc-600 mt-1">
             Browse registered A2A-compatible agents on the network
           </p>
         </div>
@@ -206,7 +206,7 @@ export default function AgentsPage() {
           placeholder="Search agents by name, skill, or description..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 bg-white/5 border-white/[0.06] text-white placeholder:text-zinc-600 h-10"
+          className="pl-9 bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 h-10"
         />
       </motion.div>
 
@@ -218,9 +218,9 @@ export default function AgentsPage() {
       </div>
 
       {filteredAgents.length === 0 && (
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-12 text-center">
+        <div className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md bg-white/60 p-12 text-center">
           <Bot className="h-8 w-8 text-zinc-600 mx-auto mb-3" />
-          <p className="text-sm text-zinc-500">No agents match your search</p>
+          <p className="text-sm text-zinc-600">No agents match your search</p>
         </div>
       )}
     </div>

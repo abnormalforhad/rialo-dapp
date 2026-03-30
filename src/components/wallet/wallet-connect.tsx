@@ -22,7 +22,7 @@ export function WalletConnect() {
     return (
       <Button
         onClick={() => setVisible(true)}
-        className="relative bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300"
+        className="relative bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-zinc-900 border-0 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300"
       >
         <Wallet className="mr-2 h-4 w-4" />
         Connect Wallet
@@ -33,7 +33,7 @@ export function WalletConnect() {
   return (
     <div className="flex items-center gap-2">
       {/* Balance */}
-      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/[0.06]">
+      <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-zinc-200/60 shadow-sm backdrop-blur-md">
         <div className="h-2 w-2 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400" />
         <span className="text-sm font-medium text-zinc-200">
           {formattedBalance}
@@ -43,13 +43,13 @@ export function WalletConnect() {
       {/* Address */}
       <button
         onClick={handleCopy}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/[0.06] hover:bg-white/10 transition-colors cursor-pointer"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-zinc-200/60 shadow-sm backdrop-blur-md hover:bg-zinc-100/50 transition-colors cursor-pointer"
       >
-        <span className="text-sm font-mono text-zinc-300">{shortAddress}</span>
+        <span className="text-sm font-mono text-zinc-600">{shortAddress}</span>
         {copied ? (
           <Check className="h-3 w-3 text-emerald-400" />
         ) : (
-          <Copy className="h-3 w-3 text-zinc-500" />
+          <Copy className="h-3 w-3 text-zinc-600" />
         )}
       </button>
 
@@ -58,7 +58,7 @@ export function WalletConnect() {
         variant="ghost"
         size="icon"
         onClick={disconnect}
-        className="text-zinc-400 hover:text-red-400 hover:bg-red-400/10"
+        className="text-zinc-600 hover:text-red-400 hover:bg-red-400/10"
       >
         <LogOut className="h-4 w-4" />
       </Button>

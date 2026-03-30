@@ -53,9 +53,9 @@ const STATUS_BADGE_CLASS: Record<EscrowStatus, string> = {
   [EscrowStatus.Refunded]:
     "bg-orange-500/15 text-orange-400 border-orange-500/25",
   [EscrowStatus.Expired]:
-    "bg-zinc-500/15 text-zinc-400 border-zinc-500/25",
+    "bg-zinc-500/15 text-zinc-600 border-zinc-500/25",
   [EscrowStatus.Cancelled]:
-    "bg-zinc-500/15 text-zinc-500 border-zinc-500/25",
+    "bg-zinc-500/15 text-zinc-600 border-zinc-500/25",
 };
 
 export function EscrowCard({ escrow, index = 0 }: EscrowCardProps) {
@@ -76,10 +76,10 @@ export function EscrowCard({ escrow, index = 0 }: EscrowCardProps) {
       <Link href={`/dashboard/tasks/${escrow.id}`}>
         <div
           className={cn(
-            "group relative overflow-hidden rounded-2xl border bg-[#0f0f1a]/80 backdrop-blur-sm p-5 transition-all duration-300 hover:translate-y-[-2px]",
+            "group relative overflow-hidden rounded-2xl border glass backdrop-blur-sm p-5 transition-all duration-300 hover:translate-y-[-2px]",
             isActive
               ? "border-indigo-500/20 hover:border-indigo-500/40 hover:shadow-lg hover:shadow-indigo-500/10"
-              : "border-white/[0.06] hover:border-white/10 hover:shadow-lg hover:shadow-white/5",
+              : "border-zinc-200/60 shadow-sm backdrop-blur-md hover:border-zinc-200/60 shadow-sm backdrop-blur-md hover:shadow-lg hover:shadow-white/5",
             isJudging && "border-purple-500/30"
           )}
         >
@@ -94,10 +94,10 @@ export function EscrowCard({ escrow, index = 0 }: EscrowCardProps) {
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate pr-4 group-hover:text-indigo-300 transition-colors">
+              <p className="text-sm font-medium text-zinc-900 truncate pr-4 group-hover:text-indigo-300 transition-colors">
                 {escrow.promptText}
               </p>
-              <p className="text-xs text-zinc-500 font-mono mt-1">
+              <p className="text-xs text-zinc-600 font-mono mt-1">
                 {escrow.id}
               </p>
             </div>
@@ -116,37 +116,37 @@ export function EscrowCard({ escrow, index = 0 }: EscrowCardProps) {
           {/* Info grid */}
           <div className="grid grid-cols-3 gap-3 mt-4">
             <div>
-              <p className="text-[11px] text-zinc-500 mb-0.5">Amount</p>
+              <p className="text-[11px] text-zinc-600 mb-0.5">Amount</p>
               <div className="flex items-center gap-1">
                 <Coins className="h-3 w-3 text-indigo-400" />
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-semibold text-zinc-900">
                   {formatKelvins(escrow.amount)}
                 </p>
               </div>
             </div>
 
             <div>
-              <p className="text-[11px] text-zinc-500 mb-0.5">Performer</p>
-              <p className="text-sm font-mono text-zinc-300">
+              <p className="text-[11px] text-zinc-600 mb-0.5">Performer</p>
+              <p className="text-sm font-mono text-zinc-600">
                 {shortenAddress(escrow.performer, 6)}
               </p>
             </div>
 
             <div>
-              <p className="text-[11px] text-zinc-500 mb-0.5">Deadline</p>
+              <p className="text-[11px] text-zinc-600 mb-0.5">Deadline</p>
               {isActive ? (
                 <CountdownTimer
                   deadline={escrow.deadline}
                   compact
                 />
               ) : (
-                <p className="text-sm text-zinc-400">—</p>
+                <p className="text-sm text-zinc-600">—</p>
               )}
             </div>
           </div>
 
           {/* Footer arrow */}
-          <div className="flex items-center justify-end mt-3 pt-3 border-t border-white/[0.04]">
+          <div className="flex items-center justify-end mt-3 pt-3 border-t border-zinc-200/60 shadow-sm backdrop-blur-md">
             <span className="text-xs text-zinc-600 group-hover:text-indigo-400 transition-colors flex items-center gap-1">
               View details
               <ArrowRight className="h-3 w-3 translate-x-0 group-hover:translate-x-1 transition-transform" />

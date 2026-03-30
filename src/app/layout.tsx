@@ -37,9 +37,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#06060e]">
+      <body className="min-h-full flex flex-col bg-[#FAF9F7]">
         <TooltipProvider>
           <AppWalletProvider>
             <Navbar />

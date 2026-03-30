@@ -19,7 +19,7 @@ export function Navbar() {
   const isDashboard = pathname?.startsWith("/dashboard");
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#0a0a12]/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 border-b border-zinc-200/60 shadow-sm backdrop-blur-md glass backdrop-blur-xl">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         {/* Left: Logo + Nav */}
         <div className="flex items-center gap-3">
@@ -27,7 +27,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-zinc-400 hover:text-white"
+              className="md:hidden text-zinc-600 hover:text-zinc-900"
               onClick={toggleSidebar}
             >
               <Menu className="h-5 w-5" />
@@ -36,11 +36,11 @@ export function Navbar() {
 
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-shadow">
-              <Zap className="h-5 w-5 text-white" />
-              <div className="absolute inset-0 rounded-lg bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Zap className="h-5 w-5 text-zinc-900" />
+              <div className="absolute inset-0 rounded-lg bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="hidden sm:block">
-              <span className="text-base font-bold tracking-tight text-white">
+              <span className="text-base font-bold tracking-tight text-zinc-900">
                 Rialo
               </span>
               <span className="text-base font-light text-indigo-400">
@@ -61,8 +61,8 @@ export function Navbar() {
                   className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
                     pathname === href
-                      ? "bg-white/10 text-white"
-                      : "text-zinc-400 hover:text-white hover:bg-white/5"
+                      ? "bg-white/60 text-zinc-900"
+                      : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/50"
                   )}
                 >
                   <Icon className="h-4 w-4" />

@@ -38,7 +38,7 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-64 flex-col border-r border-white/[0.06] bg-[#0a0a12]/95 backdrop-blur-xl transition-transform duration-300 md:sticky md:translate-x-0",
+          "fixed left-0 top-16 z-40 flex h-[calc(100vh-4rem)] w-64 flex-col border-r border-zinc-200/60 shadow-sm backdrop-blur-md glass backdrop-blur-xl transition-transform duration-300 md:sticky md:translate-x-0",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
@@ -47,7 +47,7 @@ export function Sidebar() {
           <Button
             variant="ghost"
             size="icon"
-            className="text-zinc-400"
+            className="text-zinc-600"
             onClick={toggleSidebar}
           >
             <X className="h-4 w-4" />
@@ -72,8 +72,8 @@ export function Sidebar() {
                 className={cn(
                   "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-gradient-to-r from-indigo-500/15 to-purple-500/10 text-white shadow-sm shadow-indigo-500/10 border border-indigo-500/20"
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    ? "bg-gradient-to-r from-indigo-500/15 to-purple-500/10 text-zinc-900 shadow-sm shadow-indigo-500/10 border border-indigo-500/20"
+                    : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/50"
                 )}
               >
                 <Icon
@@ -92,30 +92,30 @@ export function Sidebar() {
         </nav>
 
         {/* Bottom section */}
-        <div className="border-t border-white/[0.06] p-4">
+        <div className="border-t border-zinc-200/60 shadow-sm backdrop-blur-md p-4">
           <div className="rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/10 p-3">
             <div className="flex items-center gap-2 mb-2">
               <Activity className="h-4 w-4 text-indigo-400" />
-              <span className="text-xs font-semibold text-white">
+              <span className="text-xs font-semibold text-zinc-900">
                 Platform Status
               </span>
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-zinc-500">Network</span>
+                <span className="text-[11px] text-zinc-600">Network</span>
                 <span className="text-[11px] text-emerald-400 font-medium">
                   Operational
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-zinc-500">Latency</span>
-                <span className="text-[11px] text-zinc-300 font-medium">
+                <span className="text-[11px] text-zinc-600">Latency</span>
+                <span className="text-[11px] text-zinc-600 font-medium">
                   42ms
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-zinc-500">Block</span>
-                <span className="text-[11px] text-zinc-300 font-mono">
+                <span className="text-[11px] text-zinc-600">Block</span>
+                <span className="text-[11px] text-zinc-600 font-mono">
                   #1,847,293
                 </span>
               </div>

@@ -15,9 +15,9 @@ export function KelvinBalance() {
         <Coins className="h-5 w-5 text-indigo-400" />
       </div>
       <div>
-        <p className="text-xs text-zinc-500 font-medium">Wallet Balance</p>
-        <p className="text-lg font-bold text-white">{formattedBalance}</p>
-        <p className="text-[11px] text-zinc-500 font-mono">
+        <p className="text-xs text-zinc-600 font-medium">Wallet Balance</p>
+        <p className="text-lg font-bold text-zinc-900">{formattedBalance}</p>
+        <p className="text-[11px] text-zinc-600 font-mono">
           {balance.toLocaleString()} Kelvins
         </p>
       </div>

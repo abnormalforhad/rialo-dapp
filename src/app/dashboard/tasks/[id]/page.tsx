@@ -63,11 +63,11 @@ export default function TaskDetailPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-8 w-48 bg-white/5" />
-        <Skeleton className="h-32 w-full bg-white/5 rounded-2xl" />
+        <Skeleton className="h-8 w-48 bg-white/60" />
+        <Skeleton className="h-32 w-full bg-white/60 rounded-2xl" />
         <div className="grid md:grid-cols-2 gap-6">
-          <Skeleton className="h-64 bg-white/5 rounded-2xl" />
-          <Skeleton className="h-64 bg-white/5 rounded-2xl" />
+          <Skeleton className="h-64 bg-white/60 rounded-2xl" />
+          <Skeleton className="h-64 bg-white/60 rounded-2xl" />
         </div>
       </div>
     );
@@ -76,10 +76,10 @@ export default function TaskDetailPage() {
   if (!escrow) {
     return (
       <div className="text-center py-20">
-        <p className="text-zinc-500">Task not found</p>
+        <p className="text-zinc-600">Task not found</p>
         <Button
           variant="outline"
-          className="mt-4 border-white/10 text-zinc-400"
+          className="mt-4 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-600"
           onClick={() => router.push("/dashboard/tasks")}
         >
           Back to Tasks
@@ -108,7 +108,7 @@ export default function TaskDetailPage() {
     copyable?: boolean;
   }) => (
     <div className="flex items-start gap-3 py-3">
-      <Icon className="h-4 w-4 text-zinc-500 mt-0.5 shrink-0" />
+      <Icon className="h-4 w-4 text-zinc-600 mt-0.5 shrink-0" />
       <div className="flex-1 min-w-0">
         <p className="text-[11px] text-zinc-600 font-medium uppercase tracking-wider">
           {label}
@@ -122,7 +122,7 @@ export default function TaskDetailPage() {
       {copyable && (
         <button
           onClick={() => copy(value, label)}
-          className="text-zinc-600 hover:text-zinc-400 transition-colors shrink-0"
+          className="text-zinc-600 hover:text-zinc-600 transition-colors shrink-0"
         >
           {copiedField === label ? (
             <Check className="h-3.5 w-3.5 text-emerald-400" />
@@ -143,7 +143,7 @@ export default function TaskDetailPage() {
       >
         <button
           onClick={() => router.push("/dashboard/tasks")}
-          className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300 transition-colors mb-4"
+          className="flex items-center gap-1.5 text-sm text-zinc-600 hover:text-zinc-600 transition-colors mb-4"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Tasks
@@ -151,8 +151,8 @@ export default function TaskDetailPage() {
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-xl font-bold text-white">{escrow.id}</h1>
-            <p className="text-sm text-zinc-500 mt-0.5 max-w-lg truncate">
+            <h1 className="text-xl font-bold text-zinc-900">{escrow.id}</h1>
+            <p className="text-sm text-zinc-600 mt-0.5 max-w-lg truncate">
               {escrow.promptText}
             </p>
           </div>
@@ -163,7 +163,7 @@ export default function TaskDetailPage() {
                 ? "bg-indigo-500/15 text-indigo-400 border-indigo-500/25"
                 : escrow.status === EscrowStatus.Released
                   ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/25"
-                  : "bg-zinc-500/15 text-zinc-400 border-zinc-500/25"
+                  : "bg-zinc-500/15 text-zinc-600 border-zinc-500/25"
             }`}
           >
             {STATUS_LABELS[escrow.status]}
@@ -176,7 +176,7 @@ export default function TaskDetailPage() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="rounded-2xl border border-white/[0.06] bg-gradient-to-r from-indigo-500/5 to-purple-500/5 p-6"
+        className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md bg-gradient-to-r from-indigo-500/5 to-purple-500/5 p-6"
       >
         <div className="grid sm:grid-cols-2 gap-6">
           <div className="flex items-center gap-4">
@@ -184,8 +184,8 @@ export default function TaskDetailPage() {
               <Coins className="h-7 w-7 text-indigo-400" />
             </div>
             <div>
-              <p className="text-xs text-zinc-500 font-medium">Escrow Amount</p>
-              <p className="text-2xl font-bold text-white">
+              <p className="text-xs text-zinc-600 font-medium">Escrow Amount</p>
+              <p className="text-2xl font-bold text-zinc-900">
                 {formatKelvins(escrow.amount)}
               </p>
               <p className="text-[11px] text-zinc-600 font-mono">
@@ -207,13 +207,13 @@ export default function TaskDetailPage() {
           className="lg:col-span-3 space-y-6"
         >
           {/* Prompt */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0b0b16]/60 p-5">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+          <div className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass p-5">
+            <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2 mb-3">
               <FileText className="h-4 w-4 text-indigo-400" />
               Task Prompt
             </h3>
             <div className="rounded-xl bg-black/30 p-4">
-              <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap">
+              <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
                 {escrow.promptText}
               </p>
             </div>
@@ -221,7 +221,7 @@ export default function TaskDetailPage() {
 
           {/* Judge Verdict */}
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
+            <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2 mb-3">
               <Gavel className="h-4 w-4 text-purple-400" />
               Judge AI Verdict
             </h3>
@@ -229,11 +229,11 @@ export default function TaskDetailPage() {
           </div>
 
           {/* Details */}
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0b0b16]/60 p-5">
-            <h3 className="text-sm font-bold text-white mb-1">
+          <div className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass p-5">
+            <h3 className="text-sm font-bold text-zinc-900 mb-1">
               Escrow Details
             </h3>
-            <div className="divide-y divide-white/[0.04]">
+            <div className="divide-y divide-zinc-200">
               <InfoRow icon={Hash} label="PDA" value={escrow.pda} mono copyable />
               <InfoRow icon={User} label="Employer" value={escrow.employer} mono copyable />
               <InfoRow icon={User} label="Performer" value={escrow.performer} mono copyable />
@@ -258,8 +258,8 @@ export default function TaskDetailPage() {
           transition={{ delay: 0.2 }}
           className="lg:col-span-2"
         >
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0b0b16]/60 p-5 sticky top-24">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-5">
+          <div className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass p-5 sticky top-24">
+            <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2 mb-5">
               <Zap className="h-4 w-4 text-amber-400" />
               Task Progress
             </h3>

@@ -84,8 +84,8 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h1 className="text-2xl font-bold text-zinc-900">Dashboard</h1>
+          <p className="text-sm text-zinc-600 mt-1">
             Monitor AI agent tasks and escrow settlements
           </p>
         </div>
@@ -93,14 +93,14 @@ export default function DashboardPage() {
           {!isConnected && (
             <Button
               onClick={connect}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-0"
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-zinc-900 border-0"
             >
               <Zap className="mr-2 h-4 w-4" />
               Connect Wallet
             </Button>
           )}
           <Link href="/dashboard/create">
-            <Button className="bg-white/5 border border-white/10 text-white hover:bg-white/10">
+            <Button className="bg-white/60 border border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 hover:bg-zinc-100/50">
               <PlusCircle className="mr-2 h-4 w-4" />
               New Task
             </Button>
@@ -129,12 +129,12 @@ export default function DashboardPage() {
             className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${stat.color} border ${stat.borderColor} p-5`}
           >
             <div className="flex items-center justify-between mb-3">
-              <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-white/5 ${stat.iconColor}`}>
+              <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-white/60 ${stat.iconColor}`}>
                 <stat.icon className="h-4.5 w-4.5" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-white">{stat.value}</p>
-            <p className="text-xs text-zinc-400 mt-0.5">{stat.label}</p>
+            <p className="text-2xl font-bold text-zinc-900">{stat.value}</p>
+            <p className="text-xs text-zinc-600 mt-0.5">{stat.label}</p>
           </motion.div>
         ))}
       </div>
@@ -144,7 +144,7 @@ export default function DashboardPage() {
         {/* Active Tasks */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
               <Activity className="h-5 w-5 text-indigo-400" />
               Active Escrows
             </h2>
@@ -163,14 +163,14 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 text-center">
+            <div className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md bg-white/60 p-8 text-center">
               <CheckCircle2 className="h-8 w-8 text-zinc-600 mx-auto mb-3" />
-              <p className="text-sm text-zinc-500">No active escrows</p>
+              <p className="text-sm text-zinc-600">No active escrows</p>
               <Link href="/dashboard/create">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="mt-4 border-white/10 text-zinc-400"
+                  className="mt-4 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-600"
                 >
                   Create your first task
                 </Button>
@@ -181,12 +181,12 @@ export default function DashboardPage() {
 
         {/* Recent Activity */}
         <div className="space-y-4">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+          <h2 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
             <Zap className="h-5 w-5 text-amber-400" />
             Recent Activity
           </h2>
 
-          <div className="rounded-2xl border border-white/[0.06] bg-[#0b0b16]/60 divide-y divide-white/[0.04]">
+          <div className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass divide-y divide-zinc-200">
             {recentEscrows.map((escrow, i) => (
               <motion.div
                 key={escrow.id}
@@ -196,7 +196,7 @@ export default function DashboardPage() {
               >
                 <Link
                   href={`/dashboard/tasks/${escrow.id}`}
-                  className="flex items-center gap-3 p-4 hover:bg-white/[0.02] transition-colors"
+                  className="flex items-center gap-3 p-4 hover:bg-zinc-100/50 transition-colors"
                 >
                   <div className={`h-2 w-2 rounded-full shrink-0 ${
                     escrow.status === EscrowStatus.Released
@@ -215,7 +215,7 @@ export default function DashboardPage() {
                       {formatKelvins(escrow.amount)}
                     </p>
                   </div>
-                  <ArrowUpRight className="h-3.5 w-3.5 text-zinc-600 shrink-0" />
+                  <ArrowUpRight className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
                 </Link>
               </motion.div>
             ))}
