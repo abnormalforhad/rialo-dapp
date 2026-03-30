@@ -35,14 +35,11 @@ export async function POST(request: NextRequest) {
     let evaluationCriteria: string[] = [];
 
     try {
-      const { GoogleGenAI } = await import("@google/genai");
-      const apiKey = process.env.GEMINI_API_KEY;
+      const apiKey = process.env.OPENROUTER_API_KEY;
       
       if (!apiKey) {
-        throw new Error("GEMINI_API_KEY is not set in environment variables");
+        throw new Error("OPENROUTER_API_KEY is not set in environment variables");
       }
-
-      const ai = new GoogleGenAI({ apiKey });
       
       const evaluationPrompt = `As the Judge AI for an on-chain escrow system, evaluate the following work submission against the requirements.
       
@@ -56,15 +53,30 @@ export async function POST(request: NextRequest) {
         "evaluationCriteria": ["array", "of", "criteria", "checked"]
       }`;
 
-      const aiResponse = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: evaluationPrompt,
-        config: {
-          responseMimeType: "application/json",
-        }
+      // OpenRouter API Call (OpenAI compatible)
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://rialo-dapp.local", // Required by OpenRouter for ranking
+          "X-Title": "Rialo Agent Platform" // Optional site name for OpenRouter
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash", // Default model, can be changed to anthropic/claude-3-haiku, etc.
+          messages: [
+            { role: "user", content: evaluationPrompt }
+          ],
+          response_format: { type: "json_object" } // Force JSON output if supported by model
+        })
       });
 
-      const rawJson = aiResponse.text;
+      if (!res.ok) {
+        throw new Error(`OpenRouter API error: ${res.statusText}`);
+      }
+
+      const aiResponse = await res.json();
+      const rawJson = aiResponse.choices?.[0]?.message?.content;
       const parsed = JSON.parse(rawJson || "{}");
       
       verdict = parsed.verdict ?? false;
