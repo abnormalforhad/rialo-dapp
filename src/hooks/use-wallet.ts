@@ -1,41 +1,45 @@
 "use client";
 
-import { useAppStore } from "@/store/app-store";
-import { getRialoClient, formatKelvins, shortenAddress } from "@/lib/rialo";
-import { useCallback, useEffect } from "react";
+import { useWallet as useSolanaWallet } from "@solana/wallet-adapter-react";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { formatKelvins, shortenAddress } from "@/lib/rialo";
+import { useCallback, useEffect, useState } from "react";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 /**
- * Hook for wallet connection and balance management
+ * Hook for wallet connection and balance management using Solana Wallet Adapter
  */
 export function useWallet() {
-  const { wallet, connectWallet, disconnectWallet } = useAppStore();
+  const { wallet, publicKey, connected, select, connect: connectWallet, disconnect: disconnectWallet } = useSolanaWallet();
+  const { connection } = useConnection();
+  const [balance, setBalance] = useState<number>(0);
 
   const refreshBalance = useCallback(async () => {
-    if (!wallet?.publicKey) return;
+    if (!publicKey) return;
     try {
-      const client = await getRialoClient();
-      const balance = await client.getBalance(wallet.publicKey);
-      useAppStore.setState({
-        wallet: { ...wallet, balance },
-      });
+      const bal = await connection.getBalance(publicKey);
+      // Ensure we are interpreting the solana lamports as Kelvins based on Rialo mock logic logic
+      setBalance(bal);
     } catch (err) {
       console.error("Failed to refresh balance:", err);
     }
-  }, [wallet]);
+  }, [publicKey, connection]);
 
   useEffect(() => {
-    if (wallet?.connected) {
+    if (connected) {
       refreshBalance();
+    } else {
+      setBalance(0);
     }
-  }, [wallet?.connected, refreshBalance]);
+  }, [connected, refreshBalance]);
 
   return {
     wallet,
-    isConnected: wallet?.connected ?? false,
-    publicKey: wallet?.publicKey ?? "",
-    balance: wallet?.balance ?? 0,
-    formattedBalance: wallet ? formatKelvins(wallet.balance) : "0",
-    shortAddress: wallet ? shortenAddress(wallet.publicKey) : "",
+    isConnected: connected,
+    publicKey: publicKey?.toBase58() ?? "",
+    balance,
+    formattedBalance: connected ? formatKelvins(balance) : "0",
+    shortAddress: publicKey ? shortenAddress(publicKey.toBase58()) : "",
     connect: connectWallet,
     disconnect: disconnectWallet,
     refreshBalance,

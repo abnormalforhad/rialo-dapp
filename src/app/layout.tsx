@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar } from "@/components/layout/navbar";
+import { AppWalletProvider } from "@/components/wallet/wallet-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -40,8 +41,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#06060e]">
         <TooltipProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
+          <AppWalletProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+          </AppWalletProvider>
         </TooltipProvider>
       </body>
     </html>

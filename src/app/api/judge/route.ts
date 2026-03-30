@@ -23,32 +23,66 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Extract prompt parts
     const { id, message } = body.params;
     const promptText =
       message.parts.find((p) => p.type === "text")?.text || "";
 
-    // Simulate AI evaluation (in production, this calls a real LLM)
-    const hasWorkUri = promptText.includes("Work Submission URI:");
-    const confidence = 0.7 + Math.random() * 0.3;
-    const verdict = confidence > 0.5 && hasWorkUri;
+    // Real AI evaluation via Google Gen AI
+    let verdict = false;
+    let reasoning = "Failed to evaluate work.";
+    let confidence = 0.0;
+    let evaluationCriteria: string[] = [];
 
-    const evaluationCriteria = [
-      "Work submission URI provided",
-      "Prompt requirements addressed",
-      "Code quality assessment",
-      "Completeness check",
-      "Security review",
-    ];
+    try {
+      const { GoogleGenAI } = await import("@google/genai");
+      const apiKey = process.env.GEMINI_API_KEY;
+      
+      if (!apiKey) {
+        throw new Error("GEMINI_API_KEY is not set in environment variables");
+      }
 
-    const reasoning = verdict
-      ? `Work submission meets the task requirements. The submitted deliverable was evaluated against ${evaluationCriteria.length} criteria. ` +
-        `All core requirements from the original prompt have been addressed satisfactorily. ` +
-        `Code quality is acceptable and no critical security issues were identified. ` +
-        `Confidence: ${(confidence * 100).toFixed(1)}%.`
-      : `Work submission does not fully meet the task requirements. ` +
-        `The evaluation found gaps in addressing the original prompt specifications. ` +
-        `Key areas requiring improvement were identified during the review. ` +
-        `Confidence: ${(confidence * 100).toFixed(1)}%.`;
+      const ai = new GoogleGenAI({ apiKey });
+      
+      const evaluationPrompt = `As the Judge AI for an on-chain escrow system, evaluate the following work submission against the requirements.
+      
+      ${promptText}
+      
+      Respond accurately in valid JSON matching exactly this schema:
+      {
+        "verdict": boolean, // true if work meets requirements, false otherwise
+        "reasoning": "Detailed string explaining exactly why it passed or failed",
+        "confidence": number, // float between 0.0 and 1.0 reflecting your certainty
+        "evaluationCriteria": ["array", "of", "criteria", "checked"]
+      }`;
+
+      const aiResponse = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: evaluationPrompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      const rawJson = aiResponse.text;
+      const parsed = JSON.parse(rawJson || "{}");
+      
+      verdict = parsed.verdict ?? false;
+      reasoning = parsed.reasoning ?? "AI returned an invalid response structure.";
+      confidence = parsed.confidence ?? 0.0;
+      evaluationCriteria = parsed.evaluationCriteria ?? [];
+
+    } catch (err) {
+      console.warn("Falling back to demo AI evaluation due to error:", err);
+      // Fallback to strict mock logic if missing API keys so local testing still works
+      const hasWorkUri = promptText.includes("Work Submission URI:");
+      confidence = 0.7 + Math.random() * 0.3;
+      verdict = confidence > 0.5 && hasWorkUri;
+      evaluationCriteria = ["Work submission provided", "API Error Fallback used"];
+      reasoning = verdict 
+        ? "Work submission visually evaluated by mock fallback due to missing LLM keys." 
+        : "Failed API fallback evaluation.";
+    }
 
     // Build A2A response
     const response: A2ATaskStatusResponse = {

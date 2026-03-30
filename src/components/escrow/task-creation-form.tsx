@@ -40,7 +40,7 @@ const DEADLINE_OPTIONS = [
 
 export function TaskCreationForm() {
   const router = useRouter();
-  const { wallet, isConnected, connect } = useWallet();
+  const { wallet, publicKey, isConnected, connect } = useWallet();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -54,11 +54,11 @@ export function TaskCreationForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!wallet) return;
+    if (!isConnected || !publicKey) return;
 
     setLoading(true);
     try {
-      const task = await createTask(wallet.publicKey, {
+      const task = await createTask(publicKey, {
         promptText: form.promptText,
         performer: form.performer,
         amount: parseFloat(form.amount),
@@ -256,7 +256,15 @@ export function TaskCreationForm() {
       ) : (
         <Button
           type="button"
-          onClick={connect}
+          onClick={() => {
+            const el = document.querySelector('.wallet-adapter-button-trigger');
+            if (el) {
+              // Trigger the modal via the adapter UI if present
+              (el as HTMLButtonElement).click();
+            } else {
+              alert("Please click the Top Right Wallet Connect button!");
+            }
+          }}
           className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0 h-12 text-base font-semibold"
         >
           Connect Wallet to Continue

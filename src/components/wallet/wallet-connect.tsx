@@ -4,10 +4,12 @@ import { useWallet } from "@/hooks/use-wallet";
 import { Button } from "@/components/ui/button";
 import { Wallet, LogOut, Copy, Check } from "lucide-react";
 import { useState } from "react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 
 export function WalletConnect() {
-  const { isConnected, shortAddress, formattedBalance, connect, disconnect } =
+  const { isConnected, shortAddress, formattedBalance, disconnect } =
     useWallet();
+  const { setVisible } = useWalletModal();
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -19,7 +21,7 @@ export function WalletConnect() {
   if (!isConnected) {
     return (
       <Button
-        onClick={connect}
+        onClick={() => setVisible(true)}
         className="relative bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300"
       >
         <Wallet className="mr-2 h-4 w-4" />
