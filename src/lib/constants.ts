@@ -3,7 +3,7 @@ import type { RialoNetworkConfig } from "@/types/rialo";
 // Rialo Network Configurations
 export const RIALO_DEVNET: RialoNetworkConfig = {
   name: "Rialo DevNet",
-  rpcUrl: "https://devnet.rialo.io",
+  rpcUrl: "https://api.devnet.rialo.xyz",
   chainId: "rialo-devnet-1",
   explorerUrl: "https://explorer.rialo.io/devnet",
 };

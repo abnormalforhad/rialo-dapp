@@ -61,25 +61,55 @@ async function initClient(): Promise<RialoClient> {
             rpcUrl: ACTIVE_NETWORK.rpcUrl,
           },
         }) as unknown as RialoClient
-      : createMockClient();
+      : createRealRpcClient();
     return client;
   } catch {
-    console.warn("[rialo] SDK unavailable – falling back to mock client");
-    return createMockClient();
+    console.warn("[rialo] SDK unavailable – initializing native HTTP RPC client fallback");
+    return createRealRpcClient();
   }
 }
 
-function createMockClient(): RialoClient {
+function createRealRpcClient(): RialoClient {
   return {
     rpcUrl: ACTIVE_NETWORK.rpcUrl,
-    async getBalance() {
-      return 42_500_000_000; // 42.5 RIALO demo balance
+    async getBalance(publicKey: string) {
+      try {
+        const res = await fetch(ACTIVE_NETWORK.rpcUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "rialo_getBalance", params: [publicKey] })
+        });
+        const data = await res.json();
+        return data.result ? parseInt(data.result as string, 10) : 0;
+      } catch (err) {
+        console.error("RPC Error fetching balance:", err);
+        return 0;
+      }
     },
-    async getAccountInfo() {
-      return null;
+    async getAccountInfo(publicKey: string) {
+      try {
+        const res = await fetch(ACTIVE_NETWORK.rpcUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "rialo_getAccountInfo", params: [publicKey] })
+        });
+        const data = await res.json();
+        return data.result || null;
+      } catch (err) {
+        console.error("RPC Error fetching account info:", err);
+        return null;
+      }
     },
-    async sendTransaction() {
-      return "mock_sig_" + Math.random().toString(36).slice(2, 10);
+    async sendTransaction(serializedTx: Uint8Array) {
+      const hexTx = Array.from(serializedTx).map(b => b.toString(16).padStart(2, "0")).join("");
+      const res = await fetch(ACTIVE_NETWORK.rpcUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "rialo_sendTransaction", params: [hexTx] })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message || "Failed to send transaction via RPC");
+      return data.result as string;
     },
   };
 }
@@ -154,11 +184,7 @@ export async function buildFundTaskTx(params: FundTaskTxParams) {
     // fallback
   }
 
-  // Mock transaction for demo
-  return {
-    signature: "mock_fund_" + Date.now().toString(36),
-    params,
-  };
+  throw new Error("Failed to build FundTask transaction: Rialo CDK unavailable. True RPC requires native SDK transaction builder.");
 }
 
 export async function buildSubmitWorkTx(params: SubmitWorkTxParams) {
@@ -188,8 +214,5 @@ export async function buildSubmitWorkTx(params: SubmitWorkTxParams) {
     // fallback
   }
 
-  return {
-    signature: "mock_submit_" + Date.now().toString(36),
-    params,
-  };
+  throw new Error("Failed to build SubmitWork transaction: Rialo CDK unavailable. True RPC requires native SDK transaction builder.");
 }
