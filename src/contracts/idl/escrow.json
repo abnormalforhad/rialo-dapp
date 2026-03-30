@@ -1,0 +1,151 @@
+/**
+ * Escrow Contract IDL (Interface Definition Language)
+ * Describes the contract's instructions, accounts, and types
+ * for client-side code generation.
+ */
+{
+  "version": "0.1.0",
+  "name": "rialo_escrow",
+  "instructions": [
+    {
+      "name": "fundTask",
+      "accounts": [
+        { "name": "employer", "isMut": true, "isSigner": true },
+        { "name": "escrow", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false },
+        { "name": "timerProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [
+        { "name": "performer", "type": "publicKey" },
+        { "name": "judgeEndpoint", "type": "string" },
+        { "name": "amount", "type": "u64" },
+        { "name": "promptHash", "type": { "array": ["u8", 32] } },
+        { "name": "deadlineSeconds", "type": "i64" }
+      ]
+    },
+    {
+      "name": "submitWork",
+      "accounts": [
+        { "name": "performer", "isMut": false, "isSigner": true },
+        { "name": "escrow", "isMut": true, "isSigner": false },
+        { "name": "httpsProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [
+        { "name": "workUri", "type": "string" }
+      ]
+    },
+    {
+      "name": "processVerdict",
+      "accounts": [
+        { "name": "escrow", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "employer", "isMut": true, "isSigner": false },
+        { "name": "performer", "isMut": true, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [
+        { "name": "verdict", "type": "bool" },
+        { "name": "reasoning", "type": "string" }
+      ]
+    },
+    {
+      "name": "handleTimeout",
+      "accounts": [
+        { "name": "escrow", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "employer", "isMut": true, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": []
+    },
+    {
+      "name": "cancelTask",
+      "accounts": [
+        { "name": "employer", "isMut": true, "isSigner": true },
+        { "name": "escrow", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "timerProgram", "isMut": false, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "EscrowAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "isInitialized", "type": "bool" },
+          { "name": "employer", "type": "publicKey" },
+          { "name": "performer", "type": "publicKey" },
+          { "name": "judgeEndpoint", "type": "string" },
+          { "name": "amount", "type": "u64" },
+          { "name": "promptHash", "type": { "array": ["u8", 32] } },
+          { "name": "deadline", "type": "i64" },
+          { "name": "status", "type": { "defined": "EscrowStatus" } },
+          { "name": "createdAt", "type": "i64" },
+          { "name": "workUri", "type": { "option": "string" } },
+          { "name": "judgeVerdict", "type": { "option": "bool" } },
+          { "name": "bump", "type": "u8" }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "EscrowStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          { "name": "Funded" },
+          { "name": "WorkSubmitted" },
+          { "name": "Judging" },
+          { "name": "Approved" },
+          { "name": "Rejected" },
+          { "name": "Released" },
+          { "name": "Refunded" },
+          { "name": "Expired" },
+          { "name": "Cancelled" }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "TaskFunded",
+      "fields": [
+        { "name": "escrowPda", "type": "publicKey" },
+        { "name": "employer", "type": "publicKey" },
+        { "name": "amount", "type": "u64" },
+        { "name": "deadline", "type": "i64" }
+      ]
+    },
+    {
+      "name": "WorkSubmitted",
+      "fields": [
+        { "name": "escrowPda", "type": "publicKey" },
+        { "name": "performer", "type": "publicKey" },
+        { "name": "workUri", "type": "string" }
+      ]
+    },
+    {
+      "name": "VerdictReceived",
+      "fields": [
+        { "name": "escrowPda", "type": "publicKey" },
+        { "name": "verdict", "type": "bool" },
+        { "name": "reasoning", "type": "string" }
+      ]
+    },
+    {
+      "name": "FundsSettled",
+      "fields": [
+        { "name": "escrowPda", "type": "publicKey" },
+        { "name": "recipient", "type": "publicKey" },
+        { "name": "amount", "type": "u64" },
+        { "name": "action", "type": "string" }
+      ]
+    }
+  ]
+}
