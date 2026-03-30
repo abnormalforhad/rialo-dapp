@@ -45,7 +45,8 @@ let _clientPromise: Promise<RialoClient> | null = null;
 
 export interface RialoClient {
   getBalance(publicKey: string): Promise<number>;
-  getAccountInfo(publicKey: string): Promise<unknown>;
+  getAccountInfo(publicKey: string): Promise<{ data: string; owner: string } | null>;
+  getProgramAccounts(programId: string, filters?: any[]): Promise<Array<{ pubkey: string; account: { data: string; owner: string } }>>;
   sendTransaction(serializedTx: Uint8Array): Promise<string>;
   rpcUrl: string;
 }
@@ -91,13 +92,27 @@ function createRealRpcClient(): RialoClient {
         const res = await fetch(ACTIVE_NETWORK.rpcUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "rialo_getAccountInfo", params: [publicKey] })
+          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "rialo_getAccountInfo", params: [publicKey, { encoding: "base64" }] })
         });
         const data = await res.json();
-        return data.result || null;
+        return data.result ? { data: data.result.data[0], owner: data.result.owner } : null;
       } catch (err) {
         console.error("RPC Error fetching account info:", err);
         return null;
+      }
+    },
+    async getProgramAccounts(programId: string, filters?: any[]) {
+      try {
+        const res = await fetch(ACTIVE_NETWORK.rpcUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "rialo_getProgramAccounts", params: [programId, { encoding: "base64", filters }] })
+        });
+        const data = await res.json();
+        return data.result || [];
+      } catch (err) {
+        console.error("RPC Error fetching program accounts:", err);
+        return [];
       }
     },
     async sendTransaction(serializedTx: Uint8Array) {

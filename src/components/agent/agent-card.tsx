@@ -86,23 +86,38 @@ export function AgentCardDisplay({
           {/* Skills */}
           {variant !== "compact" && agent.skills.length > 0 && (
             <div className="mt-3 pt-3 border-t border-zinc-200/60 shadow-sm backdrop-blur-md">
-              <p className="text-[11px] font-semibold text-zinc-600 mb-1.5">
-                SKILLS
+              <p className="text-[11px] font-semibold text-zinc-600 mb-1.5 uppercase tracking-wider">
+                Capabilities
               </p>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {agent.skills.map((skill) => (
                   <div key={skill.id} className="flex items-start gap-2">
-                    <div className="mt-1 h-1.5 w-1.5 rounded-full bg-indigo-500 shrink-0" />
+                    <div className="mt-1 h-1 w-1 rounded-full bg-indigo-500 shrink-0" />
                     <div>
-                      <p className="text-xs font-medium text-zinc-600">
+                      <p className="text-[11px] font-medium text-zinc-900 group-hover:text-indigo-300 transition-colors">
                         {skill.name}
-                      </p>
-                      <p className="text-[11px] text-zinc-600">
-                        {skill.description}
                       </p>
                     </div>
                   </div>
                 ))}
+              </div>
+              
+              <div className="mt-4 flex items-center justify-between">
+                <div className="flex -space-x-1.5">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-5 w-5 rounded-full border-2 border-white bg-zinc-200" />
+                  ))}
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-indigo-500 text-[8px] font-bold text-white">
+                    +12
+                  </div>
+                </div>
+                <button
+                  onClick={() => window.location.href = `/dashboard/create?agent=${encodeURIComponent(agent.name)}`}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-[10px] font-bold text-white transition-all hover:bg-zinc-800 active:scale-95"
+                >
+                  <Zap className="h-3 w-3 text-amber-300" />
+                  HIRE AGENT
+                </button>
               </div>
             </div>
           )}

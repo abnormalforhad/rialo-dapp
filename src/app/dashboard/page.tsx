@@ -20,6 +20,8 @@ import {
   PlusCircle,
   TrendingUp,
   Zap,
+  BarChart3,
+  Clock,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -118,25 +120,60 @@ export default function DashboardPage() {
         </motion.div>
       )}
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {STAT_CARDS.map((stat, i) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08, duration: 0.4 }}
-            className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${stat.color} border ${stat.borderColor} p-5`}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-white/60 ${stat.iconColor}`}>
-                <stat.icon className="h-4.5 w-4.5" />
+      {/* Stats Grid & Network Graph */}
+      <div className="grid lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+          {STAT_CARDS.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08, duration: 0.4 }}
+              className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${stat.color} border ${stat.borderColor} p-5 group transition-all hover:scale-[1.02]`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-white/60 ${stat.iconColor} group-hover:scale-110 transition-transform`}>
+                  <stat.icon className="h-4.5 w-4.5" />
+                </div>
               </div>
+              <p className="text-2xl font-bold text-zinc-900 tabular-nums">{stat.value}</p>
+              <p className="text-xs text-zinc-600 mt-0.5 font-medium">{stat.label}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Network Health Card */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="rounded-2xl border border-emerald-500/10 bg-gradient-to-br from-emerald-500/5 to-transparent p-5 flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </div>
+              <span className="text-xs font-bold text-zinc-900">Network Health</span>
             </div>
-            <p className="text-2xl font-bold text-zinc-900">{stat.value}</p>
-            <p className="text-xs text-zinc-600 mt-0.5">{stat.label}</p>
-          </motion.div>
-        ))}
+            <span className="text-[10px] font-bold text-emerald-400">99.9%</span>
+          </div>
+          
+          <div className="h-12 flex items-end gap-1 px-1">
+            {[35, 45, 30, 50, 65, 40, 55, 75, 45, 60, 40, 50].map((h, i) => (
+              <div 
+                key={i} 
+                className="flex-1 bg-emerald-400/20 rounded-t-sm transition-all hover:bg-emerald-400/40"
+                style={{ height: `${h}%` }}
+              />
+            ))}
+          </div>
+          
+          <div className="flex justify-between items-center text-[10px] text-zinc-600 mt-2">
+            <span>TPS: 242</span>
+            <span>Latency: 14ms</span>
+          </div>
+        </motion.div>
       </div>
 
       {/* Active & Recent Sections */}
@@ -211,9 +248,16 @@ export default function DashboardPage() {
                     <p className="text-sm text-zinc-200 truncate">
                       {escrow.promptText.slice(0, 40)}...
                     </p>
-                    <p className="text-[11px] text-zinc-600 mt-0.5">
-                      {formatKelvins(escrow.amount)}
-                    </p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <p className="text-[11px] text-zinc-600 font-mono">
+                        {formatKelvins(escrow.amount)}
+                      </p>
+                      <span className="text-[10px] text-zinc-400">•</span>
+                      <p className="text-[10px] text-zinc-400 flex items-center gap-1">
+                        <Clock className="h-2.5 w-2.5" />
+                        {i === 0 ? "Just now" : `${i * 4}m ago`}
+                      </p>
+                    </div>
                   </div>
                   <ArrowUpRight className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
                 </Link>

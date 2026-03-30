@@ -15,9 +15,11 @@ import {
   buildFundTaskTx,
   buildSubmitWorkTx,
   parseRialoToKelvins,
+  getRialoClient,
 } from "./rialo";
 import { sendToJudge, parseJudgeVerdict } from "./a2a";
-import { DEFAULT_JUDGE_ENDPOINT } from "./constants";
+import { DEFAULT_JUDGE_ENDPOINT, ESCROW_PROGRAM_ID } from "./constants";
+import { deserializeEscrowAccount } from "@/contracts/escrow/state";
 
 /* ── In-memory demo state ───────────────────────────────────────────── */
 
@@ -58,78 +60,30 @@ const DEMO_ADDRESSES = {
   performer3: "AgentGamma0x5b2d4f6a8c1e3g7h9i03",
 };
 
+/* ── Metadata Persistence (LocalStorage) ────────────────────────────── */
+
+const METADATA_KEY = "rialo_escrow_metadata";
+
+function getLocalMetadata(): Record<string, any> {
+  if (typeof window === "undefined") return {};
+  try {
+    const saved = localStorage.getItem(METADATA_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLocalMetadata(pda: string, metadata: any) {
+  if (typeof window === "undefined") return;
+  const current = getLocalMetadata();
+  current[pda] = { ...current[pda], ...metadata };
+  localStorage.setItem(METADATA_KEY, JSON.stringify(current));
+}
+
 function seedDemoData() {
+  // Clear mock array — now using RPC + local metadata
   _escrows = [];
-},
-    {
-      id: "task-002",
-      pda: deriveEscrowPDA(DEMO_ADDRESSES.employer1, 2),
-      employer: DEMO_ADDRESSES.employer1,
-      performer: DEMO_ADDRESSES.performer2,
-      judgeEndpoint: DEFAULT_JUDGE_ENDPOINT,
-      amount: 12_500_000_000,
-      promptHash: "f0e1d2c3b4a596870fedcba0987654321fedcba0987654321fedcba098765432",
-      promptText: "Create a machine learning model for sentiment analysis on financial news articles with 95%+ accuracy",
-      deadline: now + 14400,
-      status: EscrowStatus.Judging,
-      createdAt: now - 7200,
-      workSubmissionUri: "ipfs://QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
-      judgeVerdict: null,
-      judgeReasoning: null,
-      bump: 253,
-    },
-    {
-      id: "task-003",
-      pda: deriveEscrowPDA(DEMO_ADDRESSES.employer2, 1),
-      employer: DEMO_ADDRESSES.employer2,
-      performer: DEMO_ADDRESSES.performer1,
-      judgeEndpoint: DEFAULT_JUDGE_ENDPOINT,
-      amount: 3_200_000_000,
-      promptHash: "1234abcd5678efgh9012ijkl3456mnop7890qrst1234uvwx5678yzab9012cdef",
-      promptText: "Design and implement a responsive landing page for a DeFi protocol with animated hero section",
-      deadline: now - 1800,
-      status: EscrowStatus.Released,
-      createdAt: now - 86400,
-      workSubmissionUri: "ipfs://QmTzQ1JRkWErjk39mryYw2WVaphAZNjLhG9K3jA3bSyMEP",
-      judgeVerdict: true,
-      judgeReasoning: "Work meets all criteria: responsive design implemented, hero animation present, DeFi-specific UI patterns used correctly. Quality exceeds expectations.",
-      bump: 252,
-    },
-    {
-      id: "task-004",
-      pda: deriveEscrowPDA(DEMO_ADDRESSES.employer2, 2),
-      employer: DEMO_ADDRESSES.employer2,
-      performer: DEMO_ADDRESSES.performer3,
-      judgeEndpoint: DEFAULT_JUDGE_ENDPOINT,
-      amount: 8_000_000_000,
-      promptHash: "deadbeef12345678cafebabe87654321deadbeef12345678cafebabe87654321",
-      promptText: "Develop a smart contract for a decentralized lottery with verifiable randomness and automatic prize distribution",
-      deadline: now - 600,
-      status: EscrowStatus.Refunded,
-      createdAt: now - 172800,
-      workSubmissionUri: null,
-      judgeVerdict: null,
-      judgeReasoning: null,
-      bump: 251,
-    },
-    {
-      id: "task-005",
-      pda: deriveEscrowPDA(DEMO_ADDRESSES.employer1, 3),
-      employer: DEMO_ADDRESSES.employer1,
-      performer: DEMO_ADDRESSES.performer3,
-      judgeEndpoint: DEFAULT_JUDGE_ENDPOINT,
-      amount: 15_000_000_000,
-      promptHash: "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
-      promptText: "Build a real-time collaborative code editor with WebSocket sync, syntax highlighting for 10+ languages, and diff viewer",
-      deadline: now + 86400,
-      status: EscrowStatus.WorkSubmitted,
-      createdAt: now - 43200,
-      workSubmissionUri: "ipfs://QmRf22bZar3WKmojipms22PkXH1MZGmvsqzQtuSvQE3uhB",
-      judgeVerdict: null,
-      judgeReasoning: null,
-      bump: 250,
-    },
-  ];
 }
 
 // Initialize demo data
@@ -138,28 +92,65 @@ seedDemoData();
 /* ── Public API ──────────────────────────────────────────────────────── */
 
 export async function getEscrows(): Promise<EscrowAccount[]> {
-  return [..._escrows];
+  const client = await getRialoClient();
+  const accounts = await client.getProgramAccounts(ESCROW_PROGRAM_ID);
+  
+  return accounts.map(({ pubkey, account }) => {
+    // Decode base64 data to Uint8Array
+    const binaryData = Uint8Array.from(atob(account.data), c => c.charCodeAt(0));
+    const decoded = deserializeEscrowAccount(binaryData);
+    const localMeta = getLocalMetadata()[pubkey] || {};
+    
+    return {
+      ...decoded,
+      id: pubkey.slice(-8), // Simplified id for display
+      pda: pubkey,
+      promptText: localMeta.promptText || "Original prompt stored on-chain as hash: " + decoded.promptHash.slice(0, 8),
+      workSubmissionUri: decoded.workUri,
+      judgeReasoning: decoded.judgeVerdict === null ? null : (decoded.judgeVerdict ? "Evaluation met all criteria." : "Required standards not achieved."),
+    } as EscrowAccount;
+  });
 }
 
 export async function getEscrow(id: string): Promise<EscrowAccount | null> {
-  return _escrows.find((e) => e.id === id) ?? null;
+  const client = await getRialoClient();
+  const info = await client.getAccountInfo(id);
+  if (!info) return null;
+
+  const binaryData = Uint8Array.from(atob(info.data), c => c.charCodeAt(0));
+  const decoded = deserializeEscrowAccount(binaryData);
+  const localMeta = getLocalMetadata()[id] || {};
+
+  return {
+    ...decoded,
+    id: id.slice(-8),
+    pda: id,
+    promptText: localMeta.promptText || "Task ID: " + id, 
+    workSubmissionUri: decoded.workUri,
+    judgeReasoning: decoded.judgeVerdict === null ? null : (decoded.judgeVerdict ? "Evaluation met all criteria." : "Required standards not achieved."),
+  } as EscrowAccount;
 }
 
 export async function getEscrowsByEmployer(
   employer: string
 ): Promise<EscrowAccount[]> {
-  return _escrows.filter((e) => e.employer === employer);
+  const all = await getEscrows();
+  return all.filter((e) => e.employer === employer);
 }
 
 export async function getEscrowsByPerformer(
   performer: string
 ): Promise<EscrowAccount[]> {
-  return _escrows.filter((e) => e.performer === performer);
+  const all = await getEscrows();
+  return all.filter((e) => e.performer === performer);
 }
 
 export async function createTask(
   employer: string,
-  params: CreateTaskParams
+  params: CreateTaskParams,
+  // Support real wallet interaction
+  sendTransaction?: (tx: any, connection: any) => Promise<string>,
+  connection?: any
 ): Promise<EscrowAccount> {
   _nonce++;
   const pda = deriveEscrowPDA(employer, _nonce + 100);
@@ -168,7 +159,7 @@ export async function createTask(
   const amountKelvins = parseRialoToKelvins(params.amount);
 
   // Build the on-chain transaction
-  await buildFundTaskTx({
+  const tx = await buildFundTaskTx({
     employer,
     performer: params.performer,
     judgeEndpoint: params.judgeEndpoint || DEFAULT_JUDGE_ENDPOINT,
@@ -177,8 +168,19 @@ export async function createTask(
     deadlineSeconds: params.deadlineSeconds,
   });
 
+  // If a real signer is provided, broadcast to the chain
+  if (sendTransaction && connection) {
+    try {
+      const signature = await sendTransaction(tx, connection);
+      console.log("Task creation transaction sent:", signature);
+    } catch (err) {
+      console.error("Failed to broadcast transaction:", err);
+      throw err;
+    }
+  }
+
   const escrow: EscrowAccount = {
-    id: `task-${String(Date.now()).slice(-6)}`,
+    id: pda.slice(-8),
     pda,
     employer,
     performer: params.performer,
@@ -195,6 +197,12 @@ export async function createTask(
     bump: 255 - _nonce,
   };
 
+  // Persist metadata locally so we have the promptText even if the chain only has the hash
+  saveLocalMetadata(pda, {
+    promptText: params.promptText,
+    createdAt: now,
+  });
+
   _escrows = [escrow, ..._escrows];
 
   emit({
@@ -204,38 +212,30 @@ export async function createTask(
     data: { status: EscrowStatus.Funded, amount: amountKelvins },
   });
 
-  // Simulate timer registration
-  setTimeout(() => {
-    const current = _escrows.find((e) => e.id === escrow.id);
-    if (current && current.status === EscrowStatus.Funded) {
-      current.status = EscrowStatus.Expired;
-      emit({
-        type: "timer_fired",
-        escrowId: escrow.id,
-        timestamp: Math.floor(Date.now() / 1000),
-        data: { reason: "deadline_expired" },
-      });
-    }
-  }, params.deadlineSeconds * 1000);
-
   return escrow;
 }
 
 export async function submitWork(
   escrowId: string,
   performer: string,
-  workUri: string
+  workUri: string,
+  sendTransaction?: (tx: any, connection: any) => Promise<string>,
+  connection?: any
 ): Promise<EscrowAccount> {
   const escrow = _escrows.find((e) => e.id === escrowId);
   if (!escrow) throw new Error("Escrow not found");
   if (escrow.status !== EscrowStatus.Funded)
     throw new Error("Escrow not in Funded state");
 
-  await buildSubmitWorkTx({
+  const tx = await buildSubmitWorkTx({
     escrowPda: escrow.pda,
     performer,
     workUri,
   });
+
+  if (sendTransaction && connection) {
+    await sendTransaction(tx, connection);
+  }
 
   escrow.workSubmissionUri = workUri;
   escrow.status = EscrowStatus.WorkSubmitted;
@@ -246,71 +246,6 @@ export async function submitWork(
     timestamp: Math.floor(Date.now() / 1000),
     data: { status: EscrowStatus.WorkSubmitted, workUri },
   });
-
-  // Simulate A2A → Judge AI flow
-  setTimeout(async () => {
-    escrow.status = EscrowStatus.Judging;
-    emit({
-      type: "status_change",
-      escrowId,
-      timestamp: Math.floor(Date.now() / 1000),
-      data: { status: EscrowStatus.Judging },
-    });
-
-    try {
-      const response = await sendToJudge(
-        escrow.judgeEndpoint,
-        escrowId,
-        escrow.promptHash,
-        workUri,
-        escrow.promptText
-      );
-      const verdict = parseJudgeVerdict(response);
-
-      if (verdict) {
-        escrow.judgeVerdict = verdict.verdict;
-        escrow.judgeReasoning = verdict.reasoning;
-        escrow.status = verdict.verdict
-          ? EscrowStatus.Approved
-          : EscrowStatus.Rejected;
-
-        emit({
-          type: "verdict_received",
-          escrowId,
-          timestamp: Math.floor(Date.now() / 1000),
-          data: { verdict: verdict.verdict, reasoning: verdict.reasoning },
-        });
-
-        // Auto-settle
-        setTimeout(() => {
-          escrow.status = verdict.verdict
-            ? EscrowStatus.Released
-            : EscrowStatus.Refunded;
-          emit({
-            type: "funds_moved",
-            escrowId,
-            timestamp: Math.floor(Date.now() / 1000),
-            data: {
-              action: verdict.verdict ? "released" : "refunded",
-              amount: escrow.amount,
-            },
-          });
-        }, 2000);
-      }
-    } catch (err) {
-      console.error("Judge evaluation failed:", err);
-      // Simulate a positive verdict for demo
-      escrow.judgeVerdict = true;
-      escrow.judgeReasoning = "Work evaluation completed successfully. All criteria met.";
-      escrow.status = EscrowStatus.Approved;
-      emit({
-        type: "verdict_received",
-        escrowId,
-        timestamp: Math.floor(Date.now() / 1000),
-        data: { verdict: true, reasoning: escrow.judgeReasoning },
-      });
-    }
-  }, 3000);
 
   return escrow;
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useWallet } from "@/hooks/use-wallet";
+import { useConnection } from "@solana/wallet-adapter-react";
 import { createTask } from "@/lib/escrow";
 import { DEFAULT_JUDGE_ENDPOINT } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -40,31 +41,32 @@ const DEADLINE_OPTIONS = [
 
 export function TaskCreationForm() {
   const router = useRouter();
-  const { wallet, publicKey, isConnected, connect } = useWallet();
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  const [form, setForm] = useState({
-    promptText: "",
-    performer: "",
-    amount: "",
-    deadlineSeconds: "7200",
-    judgeEndpoint: DEFAULT_JUDGE_ENDPOINT,
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isConnected || !publicKey) return;
-
-    setLoading(true);
-    try {
-      const task = await createTask(publicKey, {
-        promptText: form.promptText,
-        performer: form.performer,
-        amount: parseFloat(form.amount),
-        deadlineSeconds: parseInt(form.deadlineSeconds),
-        judgeEndpoint: form.judgeEndpoint,
-      });
+    const { publicKey, isConnected, sendTransaction } = useWallet();
+    const { connection } = useConnection();
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+  
+    const [form, setForm] = useState({
+      promptText: "",
+      performer: "",
+      amount: "",
+      deadlineSeconds: "7200",
+      judgeEndpoint: DEFAULT_JUDGE_ENDPOINT,
+    });
+  
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!isConnected || !publicKey) return;
+  
+      setLoading(true);
+      try {
+        const task = await createTask(publicKey, {
+          promptText: form.promptText,
+          performer: form.performer,
+          amount: parseFloat(form.amount),
+          deadlineSeconds: parseInt(form.deadlineSeconds),
+          judgeEndpoint: form.judgeEndpoint,
+        }, sendTransaction, connection);
 
       setSuccess(true);
       setTimeout(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { formatKelvins, shortenAddress } from "@/lib/rialo";
+
 import { useWallet } from "@/hooks/use-wallet";
 import { Coins } from "lucide-react";
 
