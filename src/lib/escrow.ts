@@ -59,25 +59,8 @@ const DEMO_ADDRESSES = {
 };
 
 function seedDemoData() {
-  const now = Math.floor(Date.now() / 1000);
-  _escrows = [
-    {
-      id: "task-001",
-      pda: deriveEscrowPDA(DEMO_ADDRESSES.employer1, 1),
-      employer: DEMO_ADDRESSES.employer1,
-      performer: DEMO_ADDRESSES.performer1,
-      judgeEndpoint: DEFAULT_JUDGE_ENDPOINT,
-      amount: 5_000_000_000,
-      promptHash: "a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890",
-      promptText: "Build a REST API that integrates with Stripe for subscription billing with webhook support",
-      deadline: now + 7200,
-      status: EscrowStatus.Funded,
-      createdAt: now - 3600,
-      workSubmissionUri: null,
-      judgeVerdict: null,
-      judgeReasoning: null,
-      bump: 254,
-    },
+  _escrows = [];
+},
     {
       id: "task-002",
       pda: deriveEscrowPDA(DEMO_ADDRESSES.employer1, 2),
