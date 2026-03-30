@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { useEscrow } from "@/hooks/use-escrow";
 import { EscrowCard } from "@/components/escrow/escrow-card";
 import { EscrowStatus } from "@/types/escrow";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListChecks, Search, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";

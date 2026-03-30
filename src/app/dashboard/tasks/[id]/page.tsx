@@ -13,7 +13,6 @@ import { CountdownTimer } from "@/components/escrow/countdown-timer";
 import { JudgeVerdict } from "@/components/agent/judge-verdict";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft,
@@ -29,6 +28,50 @@ import {
   Gavel,
   Zap,
 } from "lucide-react";
+
+const InfoRow = ({
+  icon: Icon,
+  label,
+  value,
+  mono,
+  copyable,
+  copiedField,
+  onCopy,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  mono?: boolean;
+  copyable?: boolean;
+  copiedField?: string | null;
+  onCopy?: (text: string, field: string) => void;
+}) => (
+  <div className="flex items-start gap-3 py-3">
+    <Icon className="h-4 w-4 text-zinc-600 mt-0.5 shrink-0" />
+    <div className="flex-1 min-w-0">
+      <p className="text-[11px] text-zinc-600 font-medium uppercase tracking-wider">
+        {label}
+      </p>
+      <p
+        className={`text-sm text-zinc-200 mt-0.5 break-all ${mono ? "font-mono text-xs" : ""}`}
+      >
+        {value}
+      </p>
+    </div>
+    {copyable && onCopy && (
+      <button
+        onClick={() => onCopy(value, label)}
+        className="text-zinc-600 hover:text-zinc-600 transition-colors shrink-0"
+      >
+        {copiedField === label ? (
+          <Check className="h-3.5 w-3.5 text-emerald-400" />
+        ) : (
+          <Copy className="h-3.5 w-3.5" />
+        )}
+      </button>
+    )}
+  </div>
+);
 
 export default function TaskDetailPage() {
   const params = useParams();
@@ -93,46 +136,6 @@ export default function TaskDetailPage() {
     EscrowStatus.WorkSubmitted,
     EscrowStatus.Judging,
   ].includes(escrow.status);
-
-  const InfoRow = ({
-    icon: Icon,
-    label,
-    value,
-    mono,
-    copyable,
-  }: {
-    icon: React.ElementType;
-    label: string;
-    value: string;
-    mono?: boolean;
-    copyable?: boolean;
-  }) => (
-    <div className="flex items-start gap-3 py-3">
-      <Icon className="h-4 w-4 text-zinc-600 mt-0.5 shrink-0" />
-      <div className="flex-1 min-w-0">
-        <p className="text-[11px] text-zinc-600 font-medium uppercase tracking-wider">
-          {label}
-        </p>
-        <p
-          className={`text-sm text-zinc-200 mt-0.5 break-all ${mono ? "font-mono text-xs" : ""}`}
-        >
-          {value}
-        </p>
-      </div>
-      {copyable && (
-        <button
-          onClick={() => copy(value, label)}
-          className="text-zinc-600 hover:text-zinc-600 transition-colors shrink-0"
-        >
-          {copiedField === label ? (
-            <Check className="h-3.5 w-3.5 text-emerald-400" />
-          ) : (
-            <Copy className="h-3.5 w-3.5" />
-          )}
-        </button>
-      )}
-    </div>
-  );
 
   return (
     <div className="space-y-6">
@@ -234,13 +237,13 @@ export default function TaskDetailPage() {
               Escrow Details
             </h3>
             <div className="divide-y divide-zinc-200">
-              <InfoRow icon={Hash} label="PDA" value={escrow.pda} mono copyable />
-              <InfoRow icon={User} label="Employer" value={escrow.employer} mono copyable />
-              <InfoRow icon={User} label="Performer" value={escrow.performer} mono copyable />
+              <InfoRow icon={Hash} label="PDA" value={escrow.pda} mono copyable copiedField={copiedField} onCopy={copy} />
+              <InfoRow icon={User} label="Employer" value={escrow.employer} mono copyable copiedField={copiedField} onCopy={copy} />
+              <InfoRow icon={User} label="Performer" value={escrow.performer} mono copyable copiedField={copiedField} onCopy={copy} />
               <InfoRow icon={Globe} label="Judge Endpoint" value={escrow.judgeEndpoint} />
-              <InfoRow icon={Hash} label="Prompt Hash" value={escrow.promptHash} mono copyable />
+              <InfoRow icon={Hash} label="Prompt Hash" value={escrow.promptHash} mono copyable copiedField={copiedField} onCopy={copy} />
               {escrow.workSubmissionUri && (
-                <InfoRow icon={ExternalLink} label="Work URI" value={escrow.workSubmissionUri} mono copyable />
+                <InfoRow icon={ExternalLink} label="Work URI" value={escrow.workSubmissionUri} mono copyable copiedField={copiedField} onCopy={copy} />
               )}
               <InfoRow
                 icon={Clock}

@@ -14,7 +14,6 @@ export function useCountdown(deadlineUnix: number) {
   const [remaining, setRemaining] = useState(calcRemaining);
 
   useEffect(() => {
-    setRemaining(calcRemaining());
     const interval = setInterval(() => {
       const r = calcRemaining();
       setRemaining(r);

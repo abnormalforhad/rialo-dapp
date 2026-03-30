@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { EscrowAccount } from "@/types/escrow";
-import { EscrowStatus, STATUS_LABELS } from "@/types/escrow";
+import { EscrowStatus } from "@/types/escrow";
 import { cn } from "@/lib/utils";
 import {
   CheckCircle2,

@@ -20,7 +20,6 @@ import {
   PlusCircle,
   TrendingUp,
   Zap,
-  BarChart3,
   Clock,
 } from "lucide-react";
 

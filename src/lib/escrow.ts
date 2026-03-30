@@ -17,7 +17,7 @@ import {
   parseRialoToKelvins,
   getRialoClient,
 } from "./rialo";
-import { sendToJudge, parseJudgeVerdict } from "./a2a";
+// import { sendToJudge, parseJudgeVerdict } from "./a2a";
 import { DEFAULT_JUDGE_ENDPOINT, ESCROW_PROGRAM_ID } from "./constants";
 import { deserializeEscrowAccount } from "@/contracts/escrow/state";
 
@@ -52,19 +52,12 @@ async function hashPrompt(text: string): Promise<string> {
 
 /* ── Seed demo data ─────────────────────────────────────────────────── */
 
-const DEMO_ADDRESSES = {
-  employer1: "7xKp3Qw9rT2vL8mN5jH6fY1bG4dA0cE",
-  employer2: "9zA4bC7dE2fG5hI8jK1lM3nO6pQ0rS",
-  performer1: "AgentAlpha0x7f3e2a1b9c8d4e5f6071",
-  performer2: "AgentBeta0x8a4c3d2e1f7b6c5d9082",
-  performer3: "AgentGamma0x5b2d4f6a8c1e3g7h9i03",
-};
 
 /* ── Metadata Persistence (LocalStorage) ────────────────────────────── */
 
 const METADATA_KEY = "rialo_escrow_metadata";
 
-function getLocalMetadata(): Record<string, any> {
+function getLocalMetadata(): Record<string, Record<string, unknown>> {
   if (typeof window === "undefined") return {};
   try {
     const saved = localStorage.getItem(METADATA_KEY);
@@ -74,10 +67,10 @@ function getLocalMetadata(): Record<string, any> {
   }
 }
 
-function saveLocalMetadata(pda: string, metadata: any) {
+function saveLocalMetadata(pda: string, metadata: Record<string, unknown>) {
   if (typeof window === "undefined") return;
   const current = getLocalMetadata();
-  current[pda] = { ...current[pda], ...metadata };
+  current[pda] = { ...(current[pda] || {}), ...metadata };
   localStorage.setItem(METADATA_KEY, JSON.stringify(current));
 }
 
@@ -105,7 +98,7 @@ export async function getEscrows(): Promise<EscrowAccount[]> {
       ...decoded,
       id: pubkey.slice(-8), // Simplified id for display
       pda: pubkey,
-      promptText: localMeta.promptText || "Original prompt stored on-chain as hash: " + decoded.promptHash.slice(0, 8),
+      promptText: (localMeta.promptText as string) || "Original prompt stored on-chain as hash: " + decoded.promptHash.slice(0, 8),
       workSubmissionUri: decoded.workUri,
       judgeReasoning: decoded.judgeVerdict === null ? null : (decoded.judgeVerdict ? "Evaluation met all criteria." : "Required standards not achieved."),
     } as EscrowAccount;
@@ -125,7 +118,7 @@ export async function getEscrow(id: string): Promise<EscrowAccount | null> {
     ...decoded,
     id: id.slice(-8),
     pda: id,
-    promptText: localMeta.promptText || "Task ID: " + id, 
+    promptText: (localMeta.promptText as string) || "Task ID: " + id, 
     workSubmissionUri: decoded.workUri,
     judgeReasoning: decoded.judgeVerdict === null ? null : (decoded.judgeVerdict ? "Evaluation met all criteria." : "Required standards not achieved."),
   } as EscrowAccount;
@@ -148,8 +141,9 @@ export async function getEscrowsByPerformer(
 export async function createTask(
   employer: string,
   params: CreateTaskParams,
-  // Support real wallet interaction
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sendTransaction?: (tx: any, connection: any) => Promise<string>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   connection?: any
 ): Promise<EscrowAccount> {
   _nonce++;
@@ -219,7 +213,9 @@ export async function submitWork(
   escrowId: string,
   performer: string,
   workUri: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sendTransaction?: (tx: any, connection: any) => Promise<string>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   connection?: any
 ): Promise<EscrowAccount> {
   const escrow = _escrows.find((e) => e.id === escrowId);
