@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { EscrowAccount } from "@/types/escrow";
 import { EscrowStatus, STATUS_LABELS } from "@/types/escrow";
-import { formatKelvins, shortenAddress } from "@/lib/rialo";
+import { formatTokenAmount, formatKelvins, shortenAddress } from "@/lib/rialo";
 import { CountdownTimer } from "./countdown-timer";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -120,7 +120,7 @@ export function EscrowCard({ escrow, index = 0 }: EscrowCardProps) {
               <div className="flex items-center gap-1">
                 <Coins className="h-3 w-3 text-indigo-400" />
                 <p className="text-sm font-semibold text-zinc-900">
-                  {formatKelvins(escrow.amount)}
+                  {formatTokenAmount(escrow.amount, escrow.token)}
                 </p>
               </div>
             </div>

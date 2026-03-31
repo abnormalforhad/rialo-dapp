@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { getEscrow } from "@/lib/escrow";
-import { formatKelvins } from "@/lib/rialo";
+import { formatTokenAmount, formatKelvins } from "@/lib/rialo";
 import { subscribeToEvents } from "@/lib/escrow";
 import type { EscrowAccount } from "@/types/escrow";
 import { EscrowStatus, STATUS_LABELS } from "@/types/escrow";
@@ -189,7 +189,7 @@ export default function TaskDetailPage() {
             <div>
               <p className="text-xs text-zinc-600 font-medium">Escrow Amount</p>
               <p className="text-2xl font-bold text-zinc-900">
-                {formatKelvins(escrow.amount)}
+                {formatTokenAmount(escrow.amount, escrow.token)}
               </p>
               <p className="text-[11px] text-zinc-600 font-mono">
                 {escrow.amount.toLocaleString()} Kelvins
