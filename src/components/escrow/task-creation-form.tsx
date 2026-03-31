@@ -47,7 +47,7 @@ const BASE_TOKEN_OPTIONS = [
 
 export function TaskCreationForm() {
   const router = useRouter();
-  const { publicKey, isConnected, sendTransaction, tokenBalances, nativeBalance } = useWallet();
+  const { publicKey, isConnected, sendTransaction, tokenBalances, nativeBalance, evmConnected, evmAddress, sendEvmTransaction } = useWallet();
   const { connection } = useConnection();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -90,25 +90,41 @@ export function TaskCreationForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submit clicked, form state:", form);
-    if (!isConnected || !publicKey) {
-      alert("Please connect your wallet first!");
+    const isEvmToken = form.token === "ETH";
+    const activeAddress = isEvmToken ? evmAddress : publicKey;
+    const isReady = isEvmToken ? evmConnected : isConnected;
+
+    if (!isReady || !activeAddress) {
+      alert(`Please connect your ${isEvmToken ? "EVM" : "Solana"} wallet to use ${form.token}!`);
       return;
     }
 
     setLoading(true);
     try {
-      console.log("Creating task with params:", form);
-      const task = await createTask(publicKey, {
+      
+      let txSender = sendTransaction;
+      let txConnection = connection;
+
+      if (isEvmToken) {
+        // Mock a Solana-like sender for escrow.ts which just wraps wagmi for EVM!
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        txSender = async (tx: any) => {
+          const hash = await sendEvmTransaction(tx);
+          return hash;
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        txConnection = "evm" as any;
+      }
+
+      const task = await createTask(activeAddress, {
         promptText: form.promptText,
         performer: form.performer,
         amount: parseFloat(form.amount),
         token: form.token,
         deadlineSeconds: parseInt(form.deadlineSeconds),
         judgeEndpoint: form.judgeEndpoint,
-      }, sendTransaction, connection);
+      }, txSender, txConnection);
 
-      console.log("Task created successfully:", task);
       setSuccess(true);
       setTimeout(() => {
         router.push(`/dashboard/tasks/${task.pda}`);
@@ -223,7 +239,7 @@ export function TaskCreationForm() {
             </Select>
           </div>
           {/* Show selected token balance */}
-          {isConnected && (
+          {(isConnected || evmConnected) && (
             <p className="text-xs text-zinc-500 mt-1">
               Available: <span className="font-semibold text-zinc-700 tabular-nums">
                 {selectedTokenBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}
@@ -320,10 +336,10 @@ export function TaskCreationForm() {
       </AnimatePresence>
 
       {/* Action Button */}
-      {isConnected ? (
+      {(isConnected || evmConnected) ? (
         <Button
           type="submit"
-          disabled={loading || !form.promptText || !form.performer || !form.amount}
+          disabled={loading || !form.promptText || !form.performer || !form.amount || (form.token === "ETH" ? !evmConnected : !isConnected)}
           className="w-full btn-minimal h-14 rounded-sm"
         >
           <span className="relative flex items-center justify-center gap-2">
@@ -339,7 +355,7 @@ export function TaskCreationForm() {
             if (el) {
               (el as HTMLButtonElement).click();
             } else {
-              alert("Please click the Top Right Wallet Connect button!");
+              alert("Please connect your wallet in the navigation bar first.");
             }
           }}
           className="w-full bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 h-14 text-lg font-bold rounded-xl transition-all"

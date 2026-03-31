@@ -88,7 +88,7 @@ export async function getEscrows(): Promise<EscrowAccount[]> {
   const client = await getRialoClient();
   const accounts = await client.getProgramAccounts(ESCROW_PROGRAM_ID);
   
-  return accounts.map(({ pubkey, account }) => {
+  const fetched = accounts.map(({ pubkey, account }) => {
     // Decode base64 data to Uint8Array
     const binaryData = Uint8Array.from(atob(account.data), c => c.charCodeAt(0));
     const decoded = deserializeEscrowAccount(binaryData);
@@ -101,8 +101,16 @@ export async function getEscrows(): Promise<EscrowAccount[]> {
       promptText: (localMeta.promptText as string) || "Original prompt stored on-chain as hash: " + decoded.promptHash.slice(0, 8),
       workSubmissionUri: decoded.workUri,
       judgeReasoning: decoded.judgeVerdict === null ? null : (decoded.judgeVerdict ? "Evaluation met all criteria." : "Required standards not achieved."),
+      token: "SOL",
     } as EscrowAccount;
   });
+
+  // Merge the simulated local tasks with the fetched ones so the frontend always shows the tasks we just created!
+  const allMap = new Map<string, EscrowAccount>();
+  for (const e of _escrows) allMap.set(e.id, e);
+  for (const e of fetched) allMap.set(e.id, e);
+
+  return Array.from(allMap.values()).sort((a, b) => b.createdAt - a.createdAt);
 }
 
 export async function getEscrow(id: string): Promise<EscrowAccount | null> {
@@ -121,6 +129,7 @@ export async function getEscrow(id: string): Promise<EscrowAccount | null> {
     promptText: (localMeta.promptText as string) || "Task ID: " + id, 
     workSubmissionUri: decoded.workUri,
     judgeReasoning: decoded.judgeVerdict === null ? null : (decoded.judgeVerdict ? "Evaluation met all criteria." : "Required standards not achieved."),
+    token: "SOL",
   } as EscrowAccount;
 }
 
@@ -160,6 +169,7 @@ export async function createTask(
     amount: amountNative,
     promptHash,
     deadlineSeconds: params.deadlineSeconds,
+    token: params.token,
   });
 
   // If a real signer is provided, broadcast to the chain

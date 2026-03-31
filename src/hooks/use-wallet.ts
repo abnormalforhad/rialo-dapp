@@ -6,6 +6,9 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { formatKelvins, shortenAddress } from "@/lib/rialo";
 import { useCallback, useEffect, useState } from "react";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { useAccount, useBalance, useConnect, useDisconnect as useEvmDisconnect, useSendTransaction as useSendEvmTransaction } from "wagmi";
+import { injected } from "wagmi/connectors";
+import { formatUnits } from "viem";
 
 export interface TokenBalance {
   symbol: string;
@@ -15,6 +18,7 @@ export interface TokenBalance {
   decimals: number;
   uiAmount: number;     // human-readable amount
   icon: string;
+  chain: "SOL" | "EVM"; // Chain identifier
 }
 
 /**
@@ -27,6 +31,13 @@ export function useWallet() {
   const [nativeBalance, setNativeBalance] = useState(0);
   const [tokenBalances, setTokenBalances] = useState<TokenBalance[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Wagmi (EVM) hooks
+  const { address: evmAddress, isConnected: evmConnected } = useAccount();
+  const { connect: wagmiConnect } = useConnect();
+  const { disconnect: wagmiDisconnect } = useEvmDisconnect();
+  const { sendTransactionAsync: sendEvmTransaction } = useSendEvmTransaction();
+  const { data: evmBalanceData, refetch: refetchEvmBalance } = useBalance({ address: evmAddress });
 
   // Well-known SPL token mints (Devnet/Mainnet) for labeling
   const KNOWN_MINTS: Record<string, { symbol: string; name: string; icon: string }> = {
@@ -78,6 +89,7 @@ export function useWallet() {
           decimals,
           uiAmount,
           icon: known?.icon || "🪙",
+          chain: "SOL",
         });
       }
 
@@ -95,7 +107,8 @@ export function useWallet() {
   useEffect(() => {
     if (connected) {
       refreshBalance();
-      const id = setInterval(refreshBalance, 8000);
+      refetchEvmBalance();
+      const id = setInterval(() => { refreshBalance(); refetchEvmBalance(); }, 8000);
       return () => clearInterval(id);
     } else {
       setNativeBalance(0);
@@ -111,6 +124,21 @@ export function useWallet() {
     balances[t.symbol] = t.amount;
   }
 
+  // Merge EVM Balance into tokenBalances
+  const allTokens = [...tokenBalances];
+  if (evmConnected && evmBalanceData) {
+    allTokens.push({
+      symbol: evmBalanceData.symbol || "ETH",
+      name: "Sepolia Ether",
+      mint: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      amount: Number(evmBalanceData.value),
+      decimals: evmBalanceData.decimals,
+      uiAmount: Number(formatUnits(evmBalanceData.value, evmBalanceData.decimals)),
+      icon: "💎",
+      chain: "EVM",
+    });
+  }
+
   return {
     wallet,
     isConnected: connected,
@@ -118,7 +146,7 @@ export function useWallet() {
     balance: nativeBalance,
     balances,
     nativeBalance,
-    tokenBalances,
+    tokenBalances: allTokens,
     balanceLoading: loading,
     formattedBalance: connected ? `${(nativeBalance / LAMPORTS_PER_SOL).toFixed(4)} SOL` : "0 SOL",
     shortAddress: publicKey ? shortenAddress(publicKey.toBase58()) : "",
@@ -126,5 +154,12 @@ export function useWallet() {
     disconnect: disconnectWallet,
     refreshBalance,
     sendTransaction: useSolanaWallet().sendTransaction,
+
+    // EVM Exports
+    evmConnected,
+    evmAddress,
+    evmConnect: () => wagmiConnect({ connector: injected() }),
+    evmDisconnect: wagmiDisconnect,
+    sendEvmTransaction,
   };
 }

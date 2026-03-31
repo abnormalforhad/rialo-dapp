@@ -23,6 +23,7 @@ const TOKEN_CONFIGS = {
   RIALO: { symbol: "RIALO", decimals: 9, icon: "🌀" },
   USDC: { symbol: "USDC", decimals: 6, icon: "💵" },
   SOL: { symbol: "SOL", decimals: 9, icon: "◎" },
+  ETH: { symbol: "ETH", decimals: 18, icon: "💎" },
 };
 
 export function formatTokenAmount(amount: number, token: string = "RIALO"): string {
@@ -171,6 +172,7 @@ export interface FundTaskTxParams {
   amount: number; // Kelvins
   promptHash: string;
   deadlineSeconds: number;
+  token?: string;
 }
 
 export interface SubmitWorkTxParams {
@@ -180,6 +182,14 @@ export interface SubmitWorkTxParams {
 }
 
 export async function buildFundTaskTx(params: FundTaskTxParams) {
+  if (params.token === "ETH") {
+    // We return a simple EVM transaction config to be sent via wagmi
+    return {
+      to: params.performer as `0x${string}`,
+      value: BigInt(params.amount), // Amount is already parsed to native 18 decimals by parseTokenAmount
+    };
+  }
+
   // Create a self-transfer with memo containing escrow metadata
   // This is safe and works on any Solana-compatible RPC
   const { Transaction, SystemProgram, PublicKey, TransactionInstruction } = await import("@solana/web3.js");
@@ -199,12 +209,15 @@ export async function buildFundTaskTx(params: FundTaskTxParams) {
   
   const tx = new Transaction();
   
-  // Add a tiny self-transfer so the tx has a valid SystemProgram instruction
+  const isSol = !params.token || params.token === "SOL";
+  const performerKey = new PublicKey(params.performer);
+  
+  // Add a transfer to actually deduct the SOL so the user's DEVNET balance updates correctly
   tx.add(
     SystemProgram.transfer({
       fromPubkey: employerKey,
-      toPubkey: employerKey,
-      lamports: 0,
+      toPubkey: performerKey, // Since we don't have a real Escrow PDA program deployed, we send it to performer directly as a proxy
+      lamports: isSol ? params.amount : 0, 
     })
   );
   

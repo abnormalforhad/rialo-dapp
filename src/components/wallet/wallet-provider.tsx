@@ -7,6 +7,12 @@ import { clusterApiUrl } from "@solana/web3.js";
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 
+import { WagmiProvider } from "wagmi";
+import { wagmiConfig } from "@/lib/wagmi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
 export function AppWalletProvider({ children }: { children: React.ReactNode }) {
   // Use a real Solana Devnet RPC for the wallet adapter connection.
   // The wallet adapter needs a functioning Solana JSON-RPC endpoint for
@@ -20,10 +26,14 @@ export function AppWalletProvider({ children }: { children: React.ReactNode }) {
   const wallets = useMemo(() => [], []);
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>{children}</WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <WagmiProvider config={wagmiConfig}>
+      <QueryClientProvider client={queryClient}>
+        <ConnectionProvider endpoint={endpoint}>
+          <WalletProvider wallets={wallets} autoConnect>
+            <WalletModalProvider>{children}</WalletModalProvider>
+          </WalletProvider>
+        </ConnectionProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }
