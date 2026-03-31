@@ -63,13 +63,15 @@ export function TaskCreationForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isConnected || !publicKey) return;
+    console.log("Submit clicked, form state:", form);
+    if (!isConnected || !publicKey) {
+      alert("Please connect your wallet first!");
+      return;
+    }
 
     setLoading(true);
     try {
-      // In a real app we would pass the selected token to the createTask 
-      // API to fund the escrow with the matching SPL token. 
-      // For this prototype we store it via the amount formatting or metadata.
+      console.log("Creating task with params:", form);
       const task = await createTask(publicKey, {
         promptText: form.promptText,
         performer: form.performer,
@@ -79,12 +81,14 @@ export function TaskCreationForm() {
         judgeEndpoint: form.judgeEndpoint,
       }, sendTransaction, connection);
 
+      console.log("Task created successfully:", task);
       setSuccess(true);
       setTimeout(() => {
-        router.push(`/dashboard/tasks/${task.id}`);
-      }, 1500);
-    } catch (err) {
+        router.push(`/dashboard/tasks/${task.pda}`);
+      }, 2000);
+    } catch (err: any) {
       console.error("Failed to create task:", err);
+      alert("Deployment failed: " + (err.message || "Check console for details"));
     } finally {
       setLoading(false);
     }
