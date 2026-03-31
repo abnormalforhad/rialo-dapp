@@ -47,7 +47,7 @@ const BASE_TOKEN_OPTIONS = [
 
 export function TaskCreationForm() {
   const router = useRouter();
-  const { publicKey, isConnected, sendTransaction, tokenBalances, nativeBalance, evmConnected, evmAddress, sendEvmTransaction } = useWallet();
+  const { publicKey, isConnected, sendTransaction, tokenBalances, nativeBalance, evmConnected, evmAddress, sendEvmTransaction, evmChainId, evmSwitchChain } = useWallet();
   const { connection } = useConnection();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -117,6 +117,19 @@ export function TaskCreationForm() {
       let txConnection = connection;
 
       if (isEvmToken) {
+        // Enforce Sepolia testnet only so users don't accidentally burn real Mainnet ETH
+        const SEPOLIA_CHAIN_ID = 11155111;
+        if (evmChainId !== SEPOLIA_CHAIN_ID && evmSwitchChain) {
+          try {
+            await evmSwitchChain({ chainId: SEPOLIA_CHAIN_ID });
+          } catch (switchError) {
+            console.error("Network switch declined or failed", switchError);
+            alert("To proceed, please authorize switching MetaMask to the Sepolia test network.");
+            setLoading(false);
+            return;
+          }
+        }
+
         // Mock a Solana-like sender for escrow.ts which just wraps wagmi for EVM!
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         txSender = async (tx: any) => {

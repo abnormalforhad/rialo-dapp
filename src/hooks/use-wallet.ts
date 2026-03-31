@@ -6,7 +6,7 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { formatKelvins, shortenAddress } from "@/lib/rialo";
 import { useCallback, useEffect, useState } from "react";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { useAccount, useBalance, useConnect, useDisconnect as useEvmDisconnect, useSendTransaction as useSendEvmTransaction } from "wagmi";
+import { useAccount, useBalance, useConnect, useDisconnect as useEvmDisconnect, useSendTransaction as useSendEvmTransaction, useChainId, useSwitchChain } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { formatUnits } from "viem";
 
@@ -38,6 +38,8 @@ export function useWallet() {
   const { disconnect: wagmiDisconnect } = useEvmDisconnect();
   const { sendTransactionAsync: sendEvmTransaction } = useSendEvmTransaction();
   const { data: evmBalanceData, refetch: refetchEvmBalance } = useBalance({ address: evmAddress });
+  const chainId = useChainId();
+  const { switchChainAsync } = useSwitchChain();
 
   // Well-known SPL token mints (Devnet/Mainnet) for labeling
   const KNOWN_MINTS: Record<string, { symbol: string; name: string; icon: string }> = {
@@ -158,8 +160,10 @@ export function useWallet() {
     // EVM Exports
     evmConnected,
     evmAddress,
+    evmChainId: chainId,
     evmConnect: () => wagmiConnect({ connector: injected() }),
     evmDisconnect: wagmiDisconnect,
+    evmSwitchChain: switchChainAsync,
     sendEvmTransaction,
   };
 }
