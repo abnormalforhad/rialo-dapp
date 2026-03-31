@@ -34,23 +34,17 @@ export function Navbar() {
             </Button>
           )}
 
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25 group-hover:shadow-indigo-500/40 transition-shadow">
-              <Zap className="h-5 w-5 text-zinc-900" />
-              <div className="absolute inset-0 rounded-lg bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 bg-[#1A1A1A] flex items-center justify-center rounded-sm transition-transform group-hover:rotate-12">
+              <span className="text-[#EBE6D9] font-bold text-xs">R</span>
             </div>
-            <div className="hidden sm:block">
-              <span className="text-base font-bold tracking-tight text-zinc-900">
-                Rialo
-              </span>
-              <span className="text-base font-light text-indigo-400">
-                Agent
-              </span>
-            </div>
+            <span className="text-xl font-medium tracking-tight text-[#1A1A1A]">
+              Rialo<span className="font-serif italic">Agent</span>
+            </span>
           </Link>
 
           {!isDashboard && (
-            <div className="hidden md:flex items-center gap-1 ml-6">
+            <div className="hidden md:flex items-center gap-8 ml-12">
               {[
                 { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
                 { href: "/dashboard/agents", label: "Agents", icon: Bot },
@@ -59,13 +53,12 @@ export function Navbar() {
                   key={href}
                   href={href}
                   className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
+                    "text-[0.7rem] uppercase tracking-widest font-bold transition-colors",
                     pathname === href
-                      ? "bg-white/60 text-zinc-900"
-                      : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/50"
+                      ? "text-[#1A1A1A]"
+                      : "text-[#1A1A1A]/60 hover:text-[#1A1A1A]"
                   )}
                 >
-                  <Icon className="h-4 w-4" />
                   {label}
                 </Link>
               ))}

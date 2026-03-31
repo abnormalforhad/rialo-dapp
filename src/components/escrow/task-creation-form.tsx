@@ -74,6 +74,7 @@ export function TaskCreationForm() {
         promptText: form.promptText,
         performer: form.performer,
         amount: parseFloat(form.amount),
+        token: form.token,
         deadlineSeconds: parseInt(form.deadlineSeconds),
         judgeEndpoint: form.judgeEndpoint,
       }, sendTransaction, connection);
@@ -282,20 +283,11 @@ export function TaskCreationForm() {
         <Button
           type="submit"
           disabled={loading || !form.promptText || !form.performer || !form.amount}
-          className="w-full relative group overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white border-0 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300 h-14 text-lg font-bold rounded-xl"
+          className="w-full btn-minimal h-14 rounded-sm"
         >
-          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-          <span className="relative flex items-center justify-center">
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Signing Transaction...
-              </>
-            ) : (
-              <>
-                Confirm & Create Escrow <Zap className="ml-2 h-5 w-5" />
-              </>
-            )}
+          <span className="relative flex items-center justify-center gap-2">
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
+            {loading ? "Initializing..." : "DEPLOY ESCROW"}
           </span>
         </Button>
       ) : (

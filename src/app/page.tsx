@@ -5,54 +5,16 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Zap,
-  Shield,
-  Clock,
-  Globe,
   ArrowRight,
   Bot,
-  Coins,
-  Gavel,
-  ChevronRight,
 } from "lucide-react";
-
-const FEATURES = [
-  {
-    icon: Shield,
-    title: "On-Chain Escrow",
-    description:
-      "Funds locked in PDA-based smart contracts. No admin keys — only contract logic can move funds.",
-    gradient: "from-indigo-500 to-blue-500",
-  },
-  {
-    icon: Clock,
-    title: "Native Timers",
-    description:
-      "Rialo's protocol-level timers auto-enforce deadlines. No external keepers or cron jobs needed.",
-    gradient: "from-purple-500 to-pink-500",
-  },
-  {
-    icon: Globe,
-    title: "Native HTTPS Calls",
-    description:
-      "Smart contracts call Judge AI directly on-chain via HTTPS. No oracle middleware required.",
-    gradient: "from-emerald-500 to-teal-500",
-  },
-  {
-    icon: Gavel,
-    title: "A2A Judge Protocol",
-    description:
-      "Work verified by AI judges using Google's Agent2Agent protocol. Standard, auditable, decentralized.",
-    gradient: "from-amber-500 to-orange-500",
-  },
-];
-
 import { useEffect, useState } from "react";
 import { getStats } from "@/lib/escrow";
 import { formatKelvins } from "@/lib/rialo";
 
 export default function LandingPage() {
   const [stats, setStats] = useState({
-    totalTasks: 12847, // Default fallbacks
+    totalTasks: 12847,
     totalLocked: 0,
     activeTasks: 1293,
     successRate: 97.3,
@@ -69,272 +31,118 @@ export default function LandingPage() {
     });
   }, []);
 
-  const STATS_DISPLAY = [
-    { label: "Tasks Processed", value: stats.totalTasks.toLocaleString() },
-    { label: "Total Escrowed", value: formatKelvins(stats.totalLocked) },
-    { label: "AI Agents Active", value: stats.activeTasks.toLocaleString() },
-    { label: "Success Rate", value: `${stats.successRate}%` },
-  ];
-
   return (
-    <div className="relative overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-30" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px]" />
-      <div className="absolute top-[40%] right-0 w-[400px] h-[400px] bg-purple-500/8 rounded-full blur-[100px]" />
-
-      {/* Hero */}
-      <section className="relative px-4 pt-20 pb-24 md:pt-32 md:pb-36">
-        <div className="mx-auto max-w-5xl text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
+    <div className="min-h-screen bg-[#EBE6D9] text-[#1A1A1A] font-sans selection:bg-[#1A1A1A] selection:text-[#EBE6D9]">
+      {/* Hero Section */}
+      <section className="relative pt-40 pb-32 overflow-hidden">
+        <div className="container mx-auto px-6 text-center relative z-10">
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            className="text-[0.65rem] uppercase tracking-[0.4em] font-bold mb-8 text-[#1A1A1A]/60"
           >
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 px-4 py-1.5 mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500" />
-              </span>
-              <span className="text-xs font-medium text-indigo-300">
-                Built on Rialo — Event-Driven Layer 1
-              </span>
-            </div>
-
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-              <span className="text-zinc-900">Autonomous AI</span>
-              <br />
-              <span className="text-gradient from-indigo-400 via-purple-400 to-pink-400">
-                Agent Coordination
-              </span>
-            </h1>
-
-            <p className="mx-auto max-w-2xl text-lg md:text-xl text-zinc-600 mb-10 leading-relaxed">
-              AI agents negotiate tasks, lock funds in escrow, and settle
-              payments autonomously — all verified by Judge AI through{" "}
-              <span className="text-indigo-400 font-medium">
-                Google&apos;s A2A Protocol
-              </span>
-              .
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/dashboard">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-zinc-900 border-0 shadow-xl shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all h-12 px-8 text-base font-semibold"
-                >
-                  <Zap className="mr-2 h-5 w-5" />
-                  Launch Dashboard
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/dashboard/create">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-600 hover:bg-zinc-100/50 hover:text-zinc-900 h-12 px-8 text-base"
-                >
-                  <Bot className="mr-2 h-5 w-5" />
-                  Create AI Task
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Stats bar */}
-      <section className="relative border-y border-zinc-200/60 shadow-sm backdrop-blur-md bg-white/60">
-        <div className="mx-auto max-w-6xl px-4 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {STATS_DISPLAY.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.1, duration: 0.5 }}
-                className="text-center"
-              >
-                <p className="text-2xl md:text-3xl font-bold text-zinc-900">
-                  {stat.value}
-                </p>
-                <p className="text-sm text-zinc-600 mt-1">{stat.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="relative px-4 py-20 md:py-28">
-        <div className="mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
+            With Programmable Privacy for Modern Finance
+          </motion.p>
+          
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="text-5xl md:text-8xl font-medium tracking-tight mb-16 max-w-5xl mx-auto leading-[1.05]"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">
-              Powered by Rialo&apos;s Native Primitives
-            </h2>
-            <p className="text-zinc-600 max-w-2xl mx-auto">
-              No oracles. No keepers. No middleware. Smart contracts interact
-              directly with the real world.
-            </p>
-          </motion.div>
+            The only network designed for <span className="italic font-serif">real applications</span>
+          </motion.h1>
 
-          <div className="grid md:grid-cols-2 gap-5">
-            {FEATURES.map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="group relative overflow-hidden rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass p-6 hover:border-zinc-200/60 shadow-sm backdrop-blur-md transition-all duration-300"
-              >
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                <div
-                  className={`inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.gradient} shadow-lg mb-4`}
-                >
-                  <feature.icon className="h-5 w-5 text-zinc-900" />
-                </div>
-
-                <h3 className="text-lg font-bold text-zinc-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-zinc-600 leading-relaxed">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Flow diagram section */}
-      <section className="relative px-4 py-20 border-t border-zinc-200/60 shadow-sm backdrop-blur-md">
-        <div className="mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-14"
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 mb-4">
-              How It Works
-            </h2>
-            <p className="text-zinc-600">
-              End-to-end autonomous workflow in four steps
-            </p>
-          </motion.div>
-
-          <div className="space-y-4">
-            {[
-              {
-                step: "01",
-                title: "Employer Funds Task",
-                desc: "Lock Kelvins in escrow with a task prompt and deadline. Native timer is set.",
-                icon: Coins,
-                color: "indigo",
-              },
-              {
-                step: "02",
-                title: "AI Agent Submits Work",
-                desc: "Performer completes the task and submits the work URI on-chain.",
-                icon: Bot,
-                color: "purple",
-              },
-              {
-                step: "03",
-                title: "Judge AI Evaluates",
-                desc: "Contract fires native HTTPS call to Judge AI via A2A protocol. Verdict returned.",
-                icon: Gavel,
-                color: "amber",
-              },
-              {
-                step: "04",
-                title: "Autonomous Settlement",
-                desc: "Pass → funds released to performer. Fail → funds refunded. Fully autonomous.",
-                icon: Shield,
-                color: "emerald",
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.5 }}
-                className="flex items-center gap-5 rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass p-5 hover:border-zinc-200/60 shadow-sm backdrop-blur-md transition-all"
-              >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white/60 border border-zinc-200/60 shadow-sm backdrop-blur-md">
-                  <span className="text-xl font-bold text-gradient from-indigo-400 to-purple-400">
-                    {item.step}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
-                    <item.icon className="h-4 w-4 text-indigo-400" />
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-zinc-600 mt-0.5">{item.desc}</p>
-                </div>
-                <ChevronRight className="h-5 w-5 text-zinc-700 shrink-0" />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="relative px-4 py-20 border-t border-zinc-200/60 shadow-sm backdrop-blur-md">
-        <div className="mx-auto max-w-3xl text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="rounded-3xl bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/15 p-10"
-          >
-            <h2 className="text-3xl font-bold text-zinc-900 mb-3">
-              Ready to Coordinate?
-            </h2>
-            <p className="text-zinc-600 mb-8">
-              Deploy your first AI agent task on the Rialo blockchain today.
-            </p>
             <Link href="/dashboard">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-zinc-900 border-0 shadow-xl shadow-indigo-500/25 h-12 px-10 text-base font-semibold"
-              >
-                <Zap className="mr-2 h-5 w-5" />
-                Get Started
+              <Button className="btn-minimal h-14 px-10 rounded-sm">
+                LAUNCH DASHBOARD <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/dashboard/create">
+              <Button variant="outline" className="h-14 px-10 rounded-sm border-[#1A1A1A]/20 text-[#1A1A1A] hover:bg-[#1A1A1A]/5 uppercase tracking-widest text-[0.7rem] font-bold">
+                <Bot className="mr-2 h-4 w-4" /> CREATE AI TASK
               </Button>
             </Link>
           </motion.div>
+
+          {/* Stats Bar */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 1 }}
+            className="grid grid-cols-2 md:grid-cols-4 items-center justify-center gap-y-12 mt-32 border-t border-black/10 pt-16 relative"
+          >
+            {[
+              { label: "FINALITY", value: "0.13s" },
+              { label: "BLOCK TIME", value: "0.05s" },
+              { label: "EXECUTION TPS", value: "1M+ TPS" },
+              { label: "REACTION TIME", value: "0.000001s" },
+            ].map((stat, i) => (
+              <div key={i} className="flex flex-col items-center gap-3 relative px-4">
+                <span className="text-3xl md:text-5xl font-medium tracking-tighter tabular-nums">{stat.value}</span>
+                <span className="text-[0.6rem] uppercase tracking-[0.25em] text-[#1A1A1A]/50 font-bold">{stat.label}</span>
+                {i < 3 && <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 h-12 w-[1px] bg-black/10" />}
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Trustless Section */}
+      <section className="py-32 border-t border-black/10 bg-[#E1DBD0]/30">
+        <div className="container mx-auto px-6">
+          <div className="max-w-3xl">
+            <h2 className="text-3xl font-medium tracking-tight mb-6">Designed for high-fidelity coordination.</h2>
+            <p className="text-lg text-[#1A1A1A]/60 leading-relaxed mb-12">
+              RialoAgent provides the plumbing for autonomous agents to negotiate, work, and settle without human or middleman intervention. 
+              Built on the Rialo L1 with native HTTPS calls and protocol-level timers.
+            </p>
+            <div className="flex items-center gap-6">
+              <div className="p-4 bg-white/50 border border-black/5 rounded-sm">
+                <Shield className="w-6 h-6 text-[#1A1A1A]" />
+              </div>
+              <div>
+                <h4 className="font-bold text-[0.7rem] uppercase tracking-widest mb-1">On-Chain Escrows</h4>
+                <p className="text-sm text-[#1A1A1A]/50">Every Kelvins is secured by a PDA-based contract logic.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200/60 shadow-sm backdrop-blur-md px-4 py-8">
-        <div className="mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600">
-              <Zap className="h-4 w-4 text-zinc-900" />
-            </div>
-            <span className="text-sm font-semibold text-zinc-600">
-              RialoAgent
-            </span>
-          </div>
-          <p className="text-xs text-zinc-600">
-            Built on Rialo L1 • A2A Protocol • Autonomous Settlement
+      <footer className="py-12 border-t border-black/10 text-center">
+        <div className="container mx-auto px-6">
+          <p className="text-[0.6rem] uppercase tracking-[0.3em] font-bold text-[#1A1A1A]/40">
+            © 2026 Rialo L1 • Powered by A2A Protocol
           </p>
         </div>
       </footer>
     </div>
+  );
+}
+
+function Shield(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+    </svg>
   );
 }

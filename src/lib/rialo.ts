@@ -19,11 +19,25 @@ import {
 
 /* ── helpers ─────────────────────────────────────────────────────────────── */
 
+const TOKEN_CONFIGS = {
+  RIALO: { symbol: "RIALO", decimals: 9, icon: "🌀" },
+  USDC: { symbol: "USDC", decimals: 6, icon: "💵" },
+  SOL: { symbol: "SOL", decimals: 9, icon: "◎" },
+};
+
+export function formatTokenAmount(amount: number, token: string = "RIALO"): string {
+  const config = TOKEN_CONFIGS[token as keyof typeof TOKEN_CONFIGS] || TOKEN_CONFIGS.RIALO;
+  const value = amount / Math.pow(10, config.decimals);
+  return `${value.toLocaleString(undefined, { maximumFractionDigits: 4 })} ${config.symbol}`;
+}
+
+export function parseTokenAmount(amount: number, token: string = "RIALO"): number {
+  const config = TOKEN_CONFIGS[token as keyof typeof TOKEN_CONFIGS] || TOKEN_CONFIGS.RIALO;
+  return Math.floor(amount * Math.pow(10, config.decimals));
+}
+
 export function formatKelvins(kelvins: number): string {
-  const rialo = kelvins / KELVINS_PER_RIALO;
-  if (rialo >= 1) return `${rialo.toLocaleString(undefined, { maximumFractionDigits: 4 })} RIALO`;
-  // Show in Kelvins for small amounts
-  return `${kelvins.toLocaleString()} Kelvins`;
+  return formatTokenAmount(kelvins, "RIALO");
 }
 
 export function parseRialoToKelvins(rialo: number): number {

@@ -14,7 +14,7 @@ import {
   deriveEscrowPDA,
   buildFundTaskTx,
   buildSubmitWorkTx,
-  parseRialoToKelvins,
+  parseTokenAmount,
   getRialoClient,
 } from "./rialo";
 // import { sendToJudge, parseJudgeVerdict } from "./a2a";
@@ -150,14 +150,14 @@ export async function createTask(
   const pda = deriveEscrowPDA(employer, _nonce + 100);
   const promptHash = await hashPrompt(params.promptText);
   const now = Math.floor(Date.now() / 1000);
-  const amountKelvins = parseRialoToKelvins(params.amount);
+  const amountNative = parseTokenAmount(params.amount, params.token);
 
   // Build the on-chain transaction
   const tx = await buildFundTaskTx({
     employer,
     performer: params.performer,
     judgeEndpoint: params.judgeEndpoint || DEFAULT_JUDGE_ENDPOINT,
-    amount: amountKelvins,
+    amount: amountNative,
     promptHash,
     deadlineSeconds: params.deadlineSeconds,
   });
@@ -179,7 +179,8 @@ export async function createTask(
     employer,
     performer: params.performer,
     judgeEndpoint: params.judgeEndpoint || DEFAULT_JUDGE_ENDPOINT,
-    amount: amountKelvins,
+    amount: amountNative,
+    token: params.token,
     promptHash,
     promptText: params.promptText,
     deadline: now + params.deadlineSeconds,
@@ -203,7 +204,7 @@ export async function createTask(
     type: "status_change",
     escrowId: escrow.id,
     timestamp: now,
-    data: { status: EscrowStatus.Funded, amount: amountKelvins },
+    data: { status: EscrowStatus.Funded, amount: amountNative, token: params.token },
   });
 
   return escrow;
