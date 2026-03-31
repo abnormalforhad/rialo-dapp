@@ -23,7 +23,7 @@ export function AgentCardDisplay({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.4 }}
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5",
+        "group relative overflow-hidden rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md transition-all duration-300 hover:border-indigo-500/30 hover:shadow-lg hover:shadow-indigo-500/5",
         variant === "compact" ? "p-4" : "p-6"
       )}
     >

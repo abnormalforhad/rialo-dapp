@@ -26,7 +26,6 @@ import {
   Gavel,
   Wallet,
   CheckCircle2,
-  ChevronDown,
 } from "lucide-react";
 
 const DEADLINE_OPTIONS = [
@@ -103,12 +102,12 @@ export function TaskCreationForm() {
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
           className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-500/20"
         >
-          <CheckCircle2 className="h-12 w-12 text-emerald-400" />
+          <CheckCircle2 className="h-12 w-12 text-emerald-500" />
         </motion.div>
-        <h3 className="text-2xl font-bold text-white mb-2">
+        <h3 className="text-2xl font-bold text-zinc-900 mb-2">
           Escrow Funded Successfully
         </h3>
-        <p className="text-base text-zinc-400">
+        <p className="text-base text-zinc-600">
           Agent has been notified. Redirecting to task dashboard...
         </p>
       </motion.div>
@@ -119,8 +118,8 @@ export function TaskCreationForm() {
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Prompt */}
       <div className="space-y-3">
-        <label className="flex items-center gap-2 text-sm font-semibold text-zinc-300">
-          <FileText className="h-4 w-4 text-cyan-400" />
+        <label className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+          <FileText className="h-4 w-4 text-indigo-500" />
           Task Prompt
         </label>
         <Textarea
@@ -129,7 +128,7 @@ export function TaskCreationForm() {
           onChange={(e) => setForm({ ...form, promptText: e.target.value })}
           required
           rows={5}
-          className="bg-zinc-900/40 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:border-cyan-500/50 focus:ring-cyan-500/20 resize-none rounded-xl text-base p-4"
+          className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500/50 focus:ring-indigo-500/20 resize-none rounded-xl text-base p-4"
         />
       </div>
 
@@ -145,7 +144,7 @@ export function TaskCreationForm() {
             value={form.performer}
             onChange={(e) => setForm({ ...form, performer: e.target.value })}
             required
-            className="bg-zinc-900/40 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 font-mono text-sm focus:border-cyan-500/50 rounded-xl h-12"
+            className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 font-mono text-sm focus:border-indigo-500/50 rounded-xl h-12"
           />
         </div>
 
@@ -164,13 +163,13 @@ export function TaskCreationForm() {
               value={form.amount}
               onChange={(e) => setForm({ ...form, amount: e.target.value })}
               required
-              className="bg-zinc-900/40 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:border-cyan-500/50 rounded-xl h-12 w-full"
+              className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500/50 rounded-xl h-12 w-full"
             />
             <Select
               value={form.token}
               onValueChange={(v) => v && setForm({ ...form, token: v })}
             >
-              <SelectTrigger className="bg-zinc-900/40 border-zinc-800 text-zinc-100 focus:border-cyan-500/50 rounded-xl h-12 w-[140px]">
+              <SelectTrigger className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 focus:border-indigo-500/50 rounded-xl h-12 w-[140px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-800 rounded-xl">
@@ -195,15 +194,15 @@ export function TaskCreationForm() {
       {/* Deadline & Judge */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-3">
-          <label className="flex items-center gap-2 text-sm font-semibold text-zinc-300">
-            <Clock className="h-4 w-4 text-cyan-400" />
+          <label className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+            <Clock className="h-4 w-4 text-indigo-500" />
             Deadline (Native Timer)
           </label>
           <Select
             value={form.deadlineSeconds}
             onValueChange={(v) => v && setForm({ ...form, deadlineSeconds: v })}
           >
-            <SelectTrigger className="bg-zinc-900/40 border-zinc-800 text-zinc-100 focus:border-cyan-500/50 rounded-xl h-12">
+            <SelectTrigger className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 focus:border-indigo-500/50 rounded-xl h-12">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="bg-zinc-900 border-zinc-800 rounded-xl">
@@ -221,8 +220,8 @@ export function TaskCreationForm() {
         </div>
 
         <div className="space-y-3">
-          <label className="flex items-center gap-2 text-sm font-semibold text-zinc-300">
-            <Gavel className="h-4 w-4 text-cyan-400" />
+          <label className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+            <Gavel className="h-4 w-4 text-indigo-500" />
             Judge AI RPC Endpoint
           </label>
           <Input
@@ -231,7 +230,7 @@ export function TaskCreationForm() {
             onChange={(e) =>
               setForm({ ...form, judgeEndpoint: e.target.value })
             }
-            className="bg-zinc-900/40 border-zinc-800 text-zinc-100 placeholder:text-zinc-600 font-mono text-sm focus:border-cyan-500/50 rounded-xl h-12"
+            className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 font-mono text-sm focus:border-indigo-500/50 rounded-xl h-12"
           />
         </div>
       </div>
@@ -246,30 +245,30 @@ export function TaskCreationForm() {
             className="rounded-2xl bg-cyan-500/5 border border-cyan-500/10 p-5 overflow-hidden"
           >
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-xs font-bold tracking-wider text-cyan-500 uppercase">
+              <h4 className="text-xs font-bold tracking-wider text-indigo-500 uppercase">
                 Transaction Preview
               </h4>
-              <div className="flex items-center gap-1.5 text-xs text-zinc-400 bg-zinc-900/50 px-2 py-1 rounded border border-zinc-800">
-                <Zap className="w-3 h-3 text-cyan-400" /> No Admin Keys
+              <div className="flex items-center gap-1.5 text-xs text-zinc-600 bg-white/60 px-2 py-1 rounded border border-zinc-200/60 shadow-sm backdrop-blur-md">
+                <Zap className="w-3 h-3 text-indigo-400" /> No Admin Keys
               </div>
             </div>
             
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between items-center py-1 border-b border-zinc-800/50">
-                <span className="text-zinc-400">Locking Amount</span>
-                <span className="text-white font-semibold text-lg flex items-center gap-1">
-                  {form.amount} <span className="text-cyan-400 text-sm font-bold">{form.token}</span>
+              <div className="flex justify-between items-center py-1 border-b border-zinc-200/60">
+                <span className="text-zinc-600">Locking Amount</span>
+                <span className="text-zinc-900 font-semibold text-lg flex items-center gap-1">
+                  {form.amount} <span className="text-indigo-500 text-sm font-bold">{form.token}</span>
                 </span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-zinc-800/50">
-                <span className="text-zinc-400">Agent Address</span>
-                <span className="text-zinc-300 font-mono text-xs">
+              <div className="flex justify-between items-center py-1 border-b border-zinc-200/60">
+                <span className="text-zinc-600">Agent Address</span>
+                <span className="text-zinc-600 font-mono text-xs">
                   {form.performer.slice(0, 16)}...
                 </span>
               </div>
               <div className="flex justify-between items-center py-1">
-                <span className="text-zinc-400">Expiration</span>
-                <span className="text-zinc-300 font-medium">
+                <span className="text-zinc-600">Expiration</span>
+                <span className="text-zinc-900 font-medium">
                   {DEADLINE_OPTIONS.find((o) => o.value === form.deadlineSeconds)?.label}
                 </span>
               </div>
@@ -283,7 +282,7 @@ export function TaskCreationForm() {
         <Button
           type="submit"
           disabled={loading || !form.promptText || !form.performer || !form.amount}
-          className="w-full relative group overflow-hidden bg-gradient-to-r from-indigo-500 via-cyan-500 to-indigo-500 text-white border-0 shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-cyan-500/30 hover:shadow-cyan-500/50 transition-all duration-300 h-14 text-lg font-bold rounded-xl"
+          className="w-full relative group overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 text-white border-0 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-300 h-14 text-lg font-bold rounded-xl"
         >
           <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
           <span className="relative flex items-center justify-center">

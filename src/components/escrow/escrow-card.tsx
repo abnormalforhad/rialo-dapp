@@ -79,7 +79,7 @@ export function EscrowCard({ escrow, index = 0 }: EscrowCardProps) {
             "group relative overflow-hidden rounded-2xl border glass backdrop-blur-sm p-5 transition-all duration-300 hover:translate-y-[-2px]",
             isActive
               ? "border-indigo-500/20 hover:border-indigo-500/40 hover:shadow-lg hover:shadow-indigo-500/10"
-              : "border-zinc-200/60 shadow-sm backdrop-blur-md hover:border-zinc-200/60 shadow-sm backdrop-blur-md hover:shadow-lg hover:shadow-white/5",
+              : "border-zinc-200/60 shadow-sm backdrop-blur-md hover:border-zinc-200/60 hover:shadow-lg hover:shadow-white/5",
             isJudging && "border-purple-500/30"
           )}
         >

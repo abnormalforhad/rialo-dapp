@@ -240,11 +240,11 @@ export default function DashboardPage() {
                       : escrow.status === EscrowStatus.Judging
                         ? "bg-purple-500 animate-pulse"
                         : escrow.status === EscrowStatus.Funded
-                          ? "bg-blue-500"
-                          : "bg-zinc-500"
+                          ? "bg-indigo-500"
+                          : "bg-zinc-400"
                   }`} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-zinc-200 truncate">
+                    <p className="text-sm text-zinc-900 truncate">
                       {escrow.promptText.slice(0, 40)}...
                     </p>
                     <div className="flex items-center gap-1.5 mt-0.5">

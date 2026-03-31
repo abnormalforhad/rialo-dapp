@@ -58,11 +58,11 @@ export function JudgeVerdict({ escrow }: JudgeVerdictProps) {
             <p className="text-sm font-semibold text-zinc-900">
               Judge AI Evaluating
             </p>
-            <p className="text-xs text-purple-300">
+            <p className="text-xs text-purple-600/70">
               A2A request in progress...
             </p>
           </div>
-          <Loader2 className="ml-auto h-5 w-5 text-purple-400 animate-spin" />
+          <Loader2 className="ml-auto h-5 w-5 text-purple-500 animate-spin" />
         </div>
 
         {/* Animated progress */}
@@ -81,9 +81,9 @@ export function JudgeVerdict({ escrow }: JudgeVerdictProps) {
                   animate={{ scale: 1 }}
                   transition={{ delay: i * 0.8 + 0.5, duration: 0.2 }}
                 >
-                  <CheckCircle2 className="h-3.5 w-3.5 text-purple-400/60" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-purple-500/60" />
                 </motion.div>
-                <span className="text-xs text-purple-300/70">{step}</span>
+                <span className="text-xs text-purple-600/70">{step}</span>
               </motion.div>
             )
           )}

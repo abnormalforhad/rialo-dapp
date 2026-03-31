@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { getEscrow } from "@/lib/escrow";
-import { formatKelvins, shortenAddress } from "@/lib/rialo";
+import { formatKelvins } from "@/lib/rialo";
 import { subscribeToEvents } from "@/lib/escrow";
 import type { EscrowAccount } from "@/types/escrow";
 import { EscrowStatus, STATUS_LABELS } from "@/types/escrow";
@@ -53,7 +53,7 @@ const InfoRow = ({
         {label}
       </p>
       <p
-        className={`text-sm text-zinc-200 mt-0.5 break-all ${mono ? "font-mono text-xs" : ""}`}
+        className={`text-sm text-zinc-900 mt-0.5 break-all ${mono ? "font-mono text-xs" : ""}`}
       >
         {value}
       </p>
@@ -215,7 +215,7 @@ export default function TaskDetailPage() {
               <FileText className="h-4 w-4 text-indigo-400" />
               Task Prompt
             </h3>
-            <div className="rounded-xl bg-black/30 p-4">
+            <div className="rounded-xl bg-zinc-100/50 p-4 border border-zinc-200/60 shadow-sm backdrop-blur-md">
               <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
                 {escrow.promptText}
               </p>
