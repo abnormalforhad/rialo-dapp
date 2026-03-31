@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { getEscrow } from "@/lib/escrow";
-import { formatTokenAmount, formatKelvins } from "@/lib/rialo";
+import { formatTokenAmount } from "@/lib/rialo";
 import { subscribeToEvents } from "@/lib/escrow";
 import type { EscrowAccount } from "@/types/escrow";
 import { EscrowStatus, STATUS_LABELS } from "@/types/escrow";

@@ -11,11 +11,7 @@ export enum EscrowStatus {
   Cancelled = "cancelled",
 }
 
-const TOKEN_CONFIGS = {
-  RIALO: { symbol: "RIALO", decimals: 9, icon: "🌀" },
-  USDC: { symbol: "USDC", decimals: 6, icon: "💵" },
-  SOL: { symbol: "SOL", decimals: 9, icon: "◎" },
-};
+
 
 export interface EscrowAccount {
   id: string;

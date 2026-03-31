@@ -35,7 +35,7 @@ export function WalletConnect() {
       {/* Balance */}
       <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/60 border border-zinc-200/60 shadow-sm backdrop-blur-md">
         <div className="h-2 w-2 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400" />
-        <span className="text-sm font-medium text-zinc-200">
+        <span className="text-sm font-medium text-zinc-700">
           {formattedBalance}
         </span>
       </div>

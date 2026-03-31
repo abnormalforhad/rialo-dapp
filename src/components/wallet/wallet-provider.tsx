@@ -3,16 +3,20 @@
 import { useMemo } from "react";
 import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { ACTIVE_NETWORK } from "@/lib/constants";
+import { clusterApiUrl } from "@solana/web3.js";
 
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 export function AppWalletProvider({ children }: { children: React.ReactNode }) {
-  // Configured for the network (we use the Rialo custom RPC from constants)
-  const endpoint = ACTIVE_NETWORK.rpcUrl;
+  // Use a real Solana Devnet RPC for the wallet adapter connection.
+  // The wallet adapter needs a functioning Solana JSON-RPC endpoint for
+  // getRecentBlockhash, sendTransaction, etc.
+  // The custom Rialo RPC (api.devnet.rialo.xyz) is used separately for
+  // escrow-specific operations in lib/rialo.ts.
+  const endpoint = useMemo(() => clusterApiUrl("devnet"), []);
   
-  // You can pass an array of adapter instances if you want to support specific legacy wallets,
-  // but standard wallets (Phantom, Solflare, etc) will be auto-detected by standard wallet standard.
+  // Standard wallets (Phantom, Solflare, etc.) are auto-detected via the
+  // wallet standard. No need to manually pass adapter instances.
   const wallets = useMemo(() => [], []);
 
   return (

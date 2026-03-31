@@ -210,15 +210,43 @@ export async function buildFundTaskTx(params: FundTaskTxParams) {
     // fallback
   }
 
-  // Fallback to standard solana web3 transaction for the prototype demo
-  const { Transaction, SystemProgram, PublicKey } = await import("@solana/web3.js");
-  const tx = new Transaction().add(
+  // Fallback: create a self-transfer with memo containing escrow metadata
+  // This is safe and works on any Solana-compatible RPC
+  const { Transaction, SystemProgram, PublicKey, TransactionInstruction } = await import("@solana/web3.js");
+  
+  const employerKey = new PublicKey(params.employer);
+  
+  // Encode task params as memo data
+  const memoData = JSON.stringify({
+    type: "rialo_escrow_fund",
+    performer: params.performer,
+    amount: params.amount,
+    promptHash: params.promptHash.slice(0, 16),
+    deadline: params.deadlineSeconds,
+  });
+  
+  const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+  
+  const tx = new Transaction();
+  
+  // Add a tiny self-transfer so the tx has a valid SystemProgram instruction
+  tx.add(
     SystemProgram.transfer({
-      fromPubkey: new PublicKey(params.employer),
-      toPubkey: new PublicKey(ESCROW_PROGRAM_ID), // send to program demo
-      lamports: 1000, 
+      fromPubkey: employerKey,
+      toPubkey: employerKey,
+      lamports: 0,
     })
   );
+  
+  // Add memo with escrow metadata
+  tx.add(
+    new TransactionInstruction({
+      keys: [{ pubkey: employerKey, isSigner: true, isWritable: false }],
+      programId: MEMO_PROGRAM_ID,
+      data: Buffer.from(memoData),
+    })
+  );
+  
   return tx;
 }
 
@@ -249,13 +277,32 @@ export async function buildSubmitWorkTx(params: SubmitWorkTxParams) {
     // fallback
   }
 
-  // Fallback to standard solana web3 transaction for the prototype demo
-  const { Transaction, SystemProgram, PublicKey } = await import("@solana/web3.js");
-  const tx = new Transaction().add(
+  // Fallback: create a self-transfer with memo containing work submission data
+  const { Transaction, SystemProgram, PublicKey, TransactionInstruction } = await import("@solana/web3.js");
+  
+  const performerKey = new PublicKey(params.performer);
+  
+  const memoData = JSON.stringify({
+    type: "rialo_escrow_submit_work",
+    escrowPda: params.escrowPda,
+    workUri: params.workUri,
+  });
+  
+  const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+  
+  const tx = new Transaction();
+  tx.add(
     SystemProgram.transfer({
-      fromPubkey: new PublicKey(params.performer),
-      toPubkey: new PublicKey(params.escrowPda), 
-      lamports: 1000,
+      fromPubkey: performerKey,
+      toPubkey: performerKey,
+      lamports: 0,
+    })
+  );
+  tx.add(
+    new TransactionInstruction({
+      keys: [{ pubkey: performerKey, isSigner: true, isWritable: false }],
+      programId: MEMO_PROGRAM_ID,
+      data: Buffer.from(memoData),
     })
   );
   return tx;

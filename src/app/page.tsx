@@ -4,33 +4,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
-  Zap,
   ArrowRight,
   Bot,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getStats } from "@/lib/escrow";
-import { formatKelvins } from "@/lib/rialo";
 
 export default function LandingPage() {
-  const [stats, setStats] = useState({
-    totalTasks: 12847,
-    totalLocked: 0,
-    activeTasks: 1293,
-    successRate: 97.3,
-  });
-
-  useEffect(() => {
-    getStats().then((res) => {
-      setStats({
-        totalTasks: res.totalTasks || 12847,
-        totalLocked: res.totalLocked,
-        activeTasks: res.activeTasks || 1293,
-        successRate: res.successRate || 97.3,
-      });
-    });
-  }, []);
-
   return (
     <div className="min-h-screen bg-[#EBE6D9] text-[#1A1A1A] font-sans selection:bg-[#1A1A1A] selection:text-[#EBE6D9]">
       {/* Hero Section */}
@@ -128,7 +106,7 @@ export default function LandingPage() {
   );
 }
 
-function Shield(props: any) {
+function Shield(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useWallet } from "@/hooks/use-wallet";
@@ -27,6 +27,7 @@ import {
   Wallet,
   CheckCircle2,
 } from "lucide-react";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 const DEADLINE_OPTIONS = [
   { value: "1800", label: "30 Minutes" },
@@ -39,15 +40,14 @@ const DEADLINE_OPTIONS = [
   { value: "604800", label: "7 Days" },
 ];
 
-const TOKEN_OPTIONS = [
-  { value: "RIALO", label: "RIALO (Native)", icon: "🌀" },
-  { value: "USDC", label: "USDC (Stable)", icon: "💵" },
+// Base token options (always shown)
+const BASE_TOKEN_OPTIONS = [
   { value: "SOL", label: "SOL (Solana)", icon: "◎" },
 ];
 
 export function TaskCreationForm() {
   const router = useRouter();
-  const { publicKey, isConnected, sendTransaction } = useWallet();
+  const { publicKey, isConnected, sendTransaction, tokenBalances, nativeBalance } = useWallet();
   const { connection } = useConnection();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -56,10 +56,37 @@ export function TaskCreationForm() {
     promptText: "",
     performer: "",
     amount: "",
-    token: "RIALO",
+    token: "SOL",
     deadlineSeconds: "7200",
     judgeEndpoint: DEFAULT_JUDGE_ENDPOINT,
   });
+
+  // Build dynamic token options from wallet balances
+  const tokenOptions = useMemo(() => {
+    const options = [...BASE_TOKEN_OPTIONS];
+    
+    // Add all SPL tokens from wallet
+    for (const token of tokenBalances) {
+      // Skip if already in base options
+      if (options.some(o => o.value === token.symbol)) continue;
+      options.push({
+        value: token.symbol,
+        label: `${token.symbol} (${token.uiAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })})`,
+        icon: token.icon,
+      });
+    }
+    
+    return options;
+  }, [tokenBalances]);
+
+  // Get balance for selected token
+  const selectedTokenBalance = useMemo(() => {
+    if (form.token === "SOL") {
+      return nativeBalance / LAMPORTS_PER_SOL;
+    }
+    const token = tokenBalances.find(t => t.symbol === form.token);
+    return token?.uiAmount ?? 0;
+  }, [form.token, tokenBalances, nativeBalance]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,9 +113,11 @@ export function TaskCreationForm() {
       setTimeout(() => {
         router.push(`/dashboard/tasks/${task.pda}`);
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to create task:", err);
-      alert("Deployment failed: " + (err.message || "Check console for details"));
+      // Try to extract an error message safely
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      alert("Deployment failed: " + (errorMessage || "Check console for details"));
     } finally {
       setLoading(false);
     }
@@ -140,8 +169,8 @@ export function TaskCreationForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Performer */}
         <div className="space-y-3">
-          <label className="flex items-center gap-2 text-sm font-semibold text-zinc-300">
-            <User className="h-4 w-4 text-cyan-400" />
+          <label className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+            <User className="h-4 w-4 text-indigo-500" />
             AI Performer Agent Address
           </label>
           <Input
@@ -155,8 +184,8 @@ export function TaskCreationForm() {
 
         {/* Amount & Token */}
         <div className="space-y-3">
-          <label className="flex items-center gap-2 text-sm font-semibold text-zinc-300">
-            <Wallet className="h-4 w-4 text-cyan-400" />
+          <label className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+            <Wallet className="h-4 w-4 text-indigo-500" />
             Funding Amount & Token
           </label>
           <div className="flex gap-2">
@@ -174,11 +203,11 @@ export function TaskCreationForm() {
               value={form.token}
               onValueChange={(v) => v && setForm({ ...form, token: v })}
             >
-              <SelectTrigger className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 focus:border-indigo-500/50 rounded-xl h-12 w-[140px]">
+              <SelectTrigger className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 focus:border-indigo-500/50 rounded-xl h-12 w-[160px]">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800 rounded-xl">
-                {TOKEN_OPTIONS.map((opt) => (
+              <SelectContent className="bg-zinc-900 border-zinc-800 rounded-xl max-h-64">
+                {tokenOptions.map((opt) => (
                   <SelectItem
                     key={opt.value}
                     value={opt.value}
@@ -193,6 +222,14 @@ export function TaskCreationForm() {
               </SelectContent>
             </Select>
           </div>
+          {/* Show selected token balance */}
+          {isConnected && (
+            <p className="text-xs text-zinc-500 mt-1">
+              Available: <span className="font-semibold text-zinc-700 tabular-nums">
+                {selectedTokenBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}
+              </span> {form.token}
+            </p>
+          )}
         </div>
       </div>
 

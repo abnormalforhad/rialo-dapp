@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { EscrowAccount } from "@/types/escrow";
 import { EscrowStatus, STATUS_LABELS } from "@/types/escrow";
-import { formatTokenAmount, formatKelvins, shortenAddress } from "@/lib/rialo";
+import { formatTokenAmount, shortenAddress } from "@/lib/rialo";
 import { CountdownTimer } from "./countdown-timer";
 import { Badge } from "@/components/ui/badge";
 import {

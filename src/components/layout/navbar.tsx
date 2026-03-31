@@ -8,7 +8,6 @@ import {
   Bot,
   LayoutDashboard,
   Menu,
-  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store/app-store";
@@ -48,7 +47,7 @@ export function Navbar() {
               {[
                 { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
                 { href: "/dashboard/agents", label: "Agents", icon: Bot },
-              ].map(({ href, label, icon: Icon }) => (
+              ].map(({ href, label }) => (
                 <Link
                   key={href}
                   href={href}
