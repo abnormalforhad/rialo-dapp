@@ -180,37 +180,7 @@ export interface SubmitWorkTxParams {
 }
 
 export async function buildFundTaskTx(params: FundTaskTxParams) {
-  try {
-    const sdk = await import("@rialo/ts-cdk");
-    const TransactionBuilder = (sdk as Record<string, unknown>).TransactionBuilder as {
-      create: () => {
-        setPayer: (k: string) => { addInstruction: (i: unknown) => { setValidFrom: (v: number) => unknown } };
-      };
-    } | undefined;
-
-    if (TransactionBuilder) {
-      // Use the actual Rialo SDK to build the transaction
-      const tx = TransactionBuilder.create()
-        .setPayer(params.employer)
-        .addInstruction({
-          programId: ESCROW_PROGRAM_ID,
-          data: {
-            discriminator: 0, // fund_task
-            performer: params.performer,
-            judgeEndpoint: params.judgeEndpoint,
-            amount: BigInt(params.amount),
-            promptHash: Uint8Array.from(params.promptHash.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)) || []),
-            deadlineSeconds: params.deadlineSeconds,
-          },
-        })
-        .setValidFrom(Date.now());
-      return tx;
-    }
-  } catch {
-    // fallback
-  }
-
-  // Fallback: create a self-transfer with memo containing escrow metadata
+  // Create a self-transfer with memo containing escrow metadata
   // This is safe and works on any Solana-compatible RPC
   const { Transaction, SystemProgram, PublicKey, TransactionInstruction } = await import("@solana/web3.js");
   
@@ -251,33 +221,7 @@ export async function buildFundTaskTx(params: FundTaskTxParams) {
 }
 
 export async function buildSubmitWorkTx(params: SubmitWorkTxParams) {
-  try {
-    const sdk = await import("@rialo/ts-cdk");
-    const TransactionBuilder = (sdk as Record<string, unknown>).TransactionBuilder as {
-      create: () => {
-        setPayer: (k: string) => { addInstruction: (i: unknown) => { setValidFrom: (v: number) => unknown } };
-      };
-    } | undefined;
-
-    if (TransactionBuilder) {
-      const tx = TransactionBuilder.create()
-        .setPayer(params.performer)
-        .addInstruction({
-          programId: ESCROW_PROGRAM_ID,
-          data: {
-            instruction: "submit_work",
-            escrowPda: params.escrowPda,
-            workUri: params.workUri,
-          },
-        })
-        .setValidFrom(Date.now());
-      return tx;
-    }
-  } catch {
-    // fallback
-  }
-
-  // Fallback: create a self-transfer with memo containing work submission data
+  // Create a self-transfer with memo containing work submission data
   const { Transaction, SystemProgram, PublicKey, TransactionInstruction } = await import("@solana/web3.js");
   
   const performerKey = new PublicKey(params.performer);
