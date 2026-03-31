@@ -189,16 +189,17 @@ export async function buildFundTaskTx(params: FundTaskTxParams) {
     } | undefined;
 
     if (TransactionBuilder) {
+      // Use the actual Rialo SDK to build the transaction
       const tx = TransactionBuilder.create()
         .setPayer(params.employer)
         .addInstruction({
           programId: ESCROW_PROGRAM_ID,
           data: {
-            instruction: "fund_task",
+            discriminator: 0, // fund_task
             performer: params.performer,
             judgeEndpoint: params.judgeEndpoint,
-            amount: params.amount,
-            promptHash: params.promptHash,
+            amount: BigInt(params.amount),
+            promptHash: Uint8Array.from(params.promptHash.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)) || []),
             deadlineSeconds: params.deadlineSeconds,
           },
         })

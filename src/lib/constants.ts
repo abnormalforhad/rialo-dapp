@@ -8,15 +8,22 @@ export const RIALO_DEVNET: RialoNetworkConfig = {
   explorerUrl: "https://explorer.rialo.io/devnet",
 };
 
-export const SEPOLIA_TESTNET: RialoNetworkConfig = {
-  name: "Ethereum Sepolia",
-  rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
-  chainId: "11155111",
-  explorerUrl: "https://sepolia.etherscan.io",
+export const RIALO_TESTNET: RialoNetworkConfig = {
+  name: "Rialo TestNet",
+  rpcUrl: "https://testnet.rialo.io",
+  chainId: "rialo-testnet-1",
+  explorerUrl: "https://explorer.rialo.io/testnet",
 };
 
-// Default to devnet for development, or Sepolia if requested
-export const ACTIVE_NETWORK = RIALO_DEVNET;
+export const RIALO_MAINNET: RialoNetworkConfig = {
+  name: "Rialo MainNet",
+  rpcUrl: "https://api.mainnet.rialo.xyz",
+  chainId: "rialo-mainnet-1",
+  explorerUrl: "https://explorer.rialo.io",
+};
+
+// Toggle this for testing vs production
+export const ACTIVE_NETWORK = RIALO_TESTNET;
 export const IS_EVM = ACTIVE_NETWORK.chainId === "11155111";
 
 // Program IDs (deployed contract addresses)
