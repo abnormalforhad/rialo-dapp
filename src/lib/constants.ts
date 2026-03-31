@@ -23,7 +23,7 @@ export const RIALO_MAINNET: RialoNetworkConfig = {
 };
 
 // Toggle this for testing vs production
-export const ACTIVE_NETWORK = RIALO_TESTNET;
+export const ACTIVE_NETWORK = RIALO_DEVNET;
 export const IS_EVM = ACTIVE_NETWORK.chainId === "11155111";
 
 // Program IDs (deployed contract addresses)
