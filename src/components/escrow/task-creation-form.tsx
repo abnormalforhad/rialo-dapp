@@ -99,6 +99,17 @@ export function TaskCreationForm() {
       return;
     }
 
+    // Address Validations
+    if (isEvmToken && !/^0x[a-fA-F0-9]{40}$/.test(form.performer)) {
+      alert("Invalid Address: You are using the Ethereum network. Please enter a valid EVM address (0x...) for the AI Performer Agent.");
+      return;
+    }
+
+    if (!isEvmToken && (form.performer.length < 32 || form.performer.length > 44 || form.performer.startsWith('0x'))) {
+      alert("Invalid Address: You are using the Solana network. Please enter a valid Solana Base58 public key for the AI Performer Agent.");
+      return;
+    }
+
     setLoading(true);
     try {
       
