@@ -107,7 +107,17 @@ export async function getEscrows(): Promise<EscrowAccount[]> {
 
   // Merge the simulated local tasks with the fetched ones so the frontend always shows the tasks we just created!
   const allMap = new Map<string, EscrowAccount>();
-  for (const e of _escrows) allMap.set(e.id, e);
+  
+  // Load any simulated escrows from LocalStorage unconditionally!
+  const localMetas = getLocalMetadata();
+  for (const key of Object.keys(localMetas)) {
+    if (localMetas[key].fullEscrow) {
+      const e = localMetas[key].fullEscrow as EscrowAccount;
+      allMap.set(e.id, e);
+    }
+  }
+
+  // Then override with real chained data if found
   for (const e of fetched) allMap.set(e.id, e);
 
   return Array.from(allMap.values()).sort((a, b) => b.createdAt - a.createdAt);
@@ -203,9 +213,11 @@ export async function createTask(
   };
 
   // Persist metadata locally so we have the promptText even if the chain only has the hash
+  // By saving the full object, we guarantee it appears in the dashboard even if the on-chain indexer is slow or simulated
   saveLocalMetadata(pda, {
     promptText: params.promptText,
     createdAt: now,
+    fullEscrow: escrow,
   });
 
   _escrows = [escrow, ..._escrows];
@@ -246,6 +258,11 @@ export async function submitWork(
 
   escrow.workSubmissionUri = workUri;
   escrow.status = EscrowStatus.WorkSubmitted;
+
+  // Persist the state change in localStorage
+  saveLocalMetadata(escrow.pda, {
+    fullEscrow: escrow,
+  });
 
   emit({
     type: "status_change",
