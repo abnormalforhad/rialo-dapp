@@ -64,7 +64,21 @@ export function useWallet() {
     });
   }
 
-  const connectWallet = useCallback(() => {
+  const connectWallet = useCallback(async () => {
+    // Force the wallet selection popup so the user can pick an account
+    // instead of silently reconnecting to the last one
+    if (typeof window !== "undefined" && (window as any).ethereum) {
+      try {
+        await (window as any).ethereum.request({
+          method: "wallet_requestPermissions",
+          params: [{ eth_accounts: {} }],
+        });
+      } catch (err) {
+        // User rejected the popup – don't proceed
+        console.error("Wallet permission request cancelled", err);
+        return;
+      }
+    }
     connect({ connector: injected() });
   }, [connect]);
 
