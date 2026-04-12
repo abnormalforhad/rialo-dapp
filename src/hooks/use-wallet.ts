@@ -64,7 +64,20 @@ export function useWallet() {
     });
   }
 
-  const connectWallet = useCallback(() => {
+  const connectWallet = useCallback(async () => {
+    // Force the wallet to show the account picker every time
+    // instead of silently reconnecting to the last account
+    if (typeof window !== "undefined" && window.ethereum) {
+      try {
+        await window.ethereum.request({
+          method: "wallet_requestPermissions",
+          params: [{ eth_accounts: {} }],
+        });
+      } catch {
+        // User rejected the permission request — that's fine
+        return;
+      }
+    }
     connect({ connector: injected() });
   }, [connect]);
 
