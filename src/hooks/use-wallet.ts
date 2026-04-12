@@ -83,10 +83,8 @@ export function useWallet() {
   }, [connect]);
 
   const disconnectWallet = useCallback(async () => {
-    disconnect();
-    
-    // Revoke permissions on disconnect so the user is forced 
-    // to choose an account the next time they connect
+    // 1. Revoke wallet-level permissions so the browser wallet
+    //    forgets this site was ever connected
     if (typeof window !== "undefined" && (window as any).ethereum) {
       try {
         await (window as any).ethereum.request({
@@ -94,8 +92,20 @@ export function useWallet() {
           params: [{ eth_accounts: {} }],
         });
       } catch (err) {
-        console.error("Failed to revoke permissions", err);
+        // Not all wallets support this – that's fine
+        console.warn("wallet_revokePermissions not supported", err);
       }
+    }
+
+    // 2. Tell wagmi to disconnect (clears internal state)
+    disconnect();
+
+    // 3. Belt-and-suspenders: purge any wagmi keys that may
+    //    have been written to localStorage before we switched to noopStorage
+    if (typeof window !== "undefined") {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("wagmi")) localStorage.removeItem(key);
+      });
     }
   }, [disconnect]);
 
