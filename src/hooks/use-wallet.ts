@@ -64,22 +64,26 @@ export function useWallet() {
     });
   }
 
-  const connectWallet = useCallback(async () => {
-    // Force the wallet to show the account picker every time
-    // instead of silently reconnecting to the last account
+  const connectWallet = useCallback(() => {
+    connect({ connector: injected() });
+  }, [connect]);
+
+  const disconnectWallet = useCallback(async () => {
+    disconnect();
+    
+    // Revoke permissions on disconnect so the user is forced 
+    // to choose an account the next time they connect
     if (typeof window !== "undefined" && (window as any).ethereum) {
       try {
         await (window as any).ethereum.request({
-          method: "wallet_requestPermissions",
+          method: "wallet_revokePermissions",
           params: [{ eth_accounts: {} }],
         });
-      } catch {
-        // User rejected the permission request — that's fine
-        return;
+      } catch (err) {
+        console.error("Failed to revoke permissions", err);
       }
     }
-    connect({ connector: injected() });
-  }, [connect]);
+  }, [disconnect]);
 
   const ensureSepolia = useCallback(async () => {
     if (chainId !== SEPOLIA_CHAIN_ID && switchChainAsync) {
@@ -96,7 +100,7 @@ export function useWallet() {
     formattedBalance: isConnected ? `${ethBalance.toFixed(4)} ETH` : "0 ETH",
     shortAddress: address ? shortenAddress(address) : "",
     connect: connectWallet,
-    disconnect,
+    disconnect: disconnectWallet,
     refreshBalance: refetchBalance,
     sendTransaction: sendTransactionAsync,
     chainId,
