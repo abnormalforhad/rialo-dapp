@@ -6,9 +6,9 @@ import Link from "next/link";
 import { useEscrow } from "@/hooks/use-escrow";
 import { useWallet } from "@/hooks/use-wallet";
 import { getStats } from "@/lib/escrow";
-import { formatKelvins } from "@/lib/rialo";
+import { formatEthAmount } from "@/lib/eth-utils";
 import { EscrowCard } from "@/components/escrow/escrow-card";
-import { KelvinBalance } from "@/components/wallet/kelvin-balance";
+import { EthBalance } from "@/components/wallet/kelvin-balance";
 import { EscrowStatus } from "@/types/escrow";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,8 +30,8 @@ export default function DashboardPage() {
     totalTasks: 0,
     activeTasks: 0,
     completedTasks: 0,
-    totalLocked: 0,
-    totalReleased: 0,
+    totalLocked: "0",
+    totalReleased: "0",
     successRate: 0,
   });
 
@@ -64,7 +64,7 @@ export default function DashboardPage() {
     },
     {
       label: "Total Locked",
-      value: formatKelvins(stats.totalLocked),
+      value: formatEthAmount(stats.totalLocked),
       icon: Coins,
       color: "from-amber-500/20 to-amber-500/5",
       iconColor: "text-amber-400",
@@ -87,14 +87,14 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">Dashboard</h1>
           <p className="text-sm text-zinc-600 mt-1">
-            Monitor AI agent tasks and escrow settlements
+            Monitor AI agent tasks and escrow settlements on Sepolia
           </p>
         </div>
         <div className="flex items-center gap-3">
           {!isConnected && (
             <Button
               onClick={connect}
-              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-zinc-900 border-0"
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white border-0"
             >
               <Zap className="mr-2 h-4 w-4" />
               Connect Wallet
@@ -115,7 +115,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <KelvinBalance />
+          <EthBalance />
         </motion.div>
       )}
 
@@ -153,9 +153,9 @@ export default function DashboardPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </div>
-              <span className="text-xs font-bold text-zinc-900">Network Health</span>
+              <span className="text-xs font-bold text-zinc-900">Sepolia Status</span>
             </div>
-            <span className="text-[10px] font-bold text-emerald-400">99.9%</span>
+            <span className="text-[10px] font-bold text-emerald-400">Live</span>
           </div>
           
           <div className="h-12 flex items-end gap-1 px-1">
@@ -169,8 +169,8 @@ export default function DashboardPage() {
           </div>
           
           <div className="flex justify-between items-center text-[10px] text-zinc-600 mt-2">
-            <span>TPS: 242</span>
-            <span>Latency: 14ms</span>
+            <span>Chain: 11155111</span>
+            <span>Protocol: A2A</span>
           </div>
         </motion.div>
       </div>
@@ -223,7 +223,7 @@ export default function DashboardPage() {
           </h2>
 
           <div className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md glass divide-y divide-zinc-200">
-            {recentEscrows.map((escrow, i) => (
+            {recentEscrows.length > 0 ? recentEscrows.map((escrow, i) => (
               <motion.div
                 key={escrow.id}
                 initial={{ opacity: 0 }}
@@ -249,7 +249,7 @@ export default function DashboardPage() {
                     </p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <p className="text-[11px] text-zinc-600 font-mono">
-                        {formatKelvins(escrow.amount)}
+                        {formatEthAmount(escrow.amount)}
                       </p>
                       <span className="text-[10px] text-zinc-400">•</span>
                       <p className="text-[10px] text-zinc-400 flex items-center gap-1">
@@ -261,7 +261,11 @@ export default function DashboardPage() {
                   <ArrowUpRight className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
                 </Link>
               </motion.div>
-            ))}
+            )) : (
+              <div className="p-6 text-center text-sm text-zinc-500">
+                No recent activity
+              </div>
+            )}
           </div>
         </div>
       </div>

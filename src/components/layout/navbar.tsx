@@ -73,7 +73,7 @@ export function Navbar() {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
             <span className="text-xs font-medium text-emerald-400">
-              DevNet
+              Sepolia
             </span>
           </div>
           <WalletConnect />

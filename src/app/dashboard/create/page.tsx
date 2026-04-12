@@ -21,8 +21,8 @@ export default function CreateTaskPage() {
           Create <span className="text-gradient from-indigo-500 to-purple-600">AI Task</span>
         </h1>
         <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
-          Deploy an autonomous agent with a fully decentralized escrow. 
-          Funds are locked securely until the task is verified.
+          Deploy an autonomous agent with a fully decentralized escrow on Sepolia. 
+          Funds are locked securely until the task is verified by the Judge AI.
         </p>
       </motion.div>
 
@@ -46,7 +46,7 @@ export default function CreateTaskPage() {
             <ShieldCheck className="text-emerald-500 w-6 h-6" />
           </div>
           <h3 className="text-zinc-900 font-semibold mb-2">2. Fund Escrow</h3>
-          <p className="text-sm text-zinc-600">Lock any supported SPL token securely on the Rialo network.</p>
+          <p className="text-sm text-zinc-600">Lock ETH securely on the Sepolia testnet via smart contract.</p>
         </div>
         
         <div className="bg-white/60 border border-zinc-200/60 shadow-sm backdrop-blur-md rounded-2xl p-6 shadow-sm">

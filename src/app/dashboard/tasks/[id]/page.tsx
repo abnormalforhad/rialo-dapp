@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { getEscrow } from "@/lib/escrow";
-import { formatTokenAmount } from "@/lib/rialo";
+import { formatTokenAmount, shortenAddress, getExplorerTxUrl } from "@/lib/eth-utils";
 import { subscribeToEvents } from "@/lib/escrow";
 import type { EscrowAccount } from "@/types/escrow";
 import { EscrowStatus, STATUS_LABELS } from "@/types/escrow";
@@ -37,6 +37,7 @@ const InfoRow = ({
   copyable,
   copiedField,
   onCopy,
+  link,
 }: {
   icon: React.ElementType;
   label: string;
@@ -45,6 +46,7 @@ const InfoRow = ({
   copyable?: boolean;
   copiedField?: string | null;
   onCopy?: (text: string, field: string) => void;
+  link?: string;
 }) => (
   <div className="flex items-start gap-3 py-3">
     <Icon className="h-4 w-4 text-zinc-600 mt-0.5 shrink-0" />
@@ -52,11 +54,23 @@ const InfoRow = ({
       <p className="text-[11px] text-zinc-600 font-medium uppercase tracking-wider">
         {label}
       </p>
-      <p
-        className={`text-sm text-zinc-900 mt-0.5 break-all ${mono ? "font-mono text-xs" : ""}`}
-      >
-        {value}
-      </p>
+      {link ? (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`text-sm text-indigo-500 hover:text-indigo-400 mt-0.5 break-all flex items-center gap-1 ${mono ? "font-mono text-xs" : ""}`}
+        >
+          {value}
+          <ExternalLink className="h-3 w-3 shrink-0" />
+        </a>
+      ) : (
+        <p
+          className={`text-sm text-zinc-900 mt-0.5 break-all ${mono ? "font-mono text-xs" : ""}`}
+        >
+          {value}
+        </p>
+      )}
     </div>
     {copyable && onCopy && (
       <button
@@ -146,7 +160,7 @@ export default function TaskDetailPage() {
       >
         <button
           onClick={() => router.push("/dashboard/tasks")}
-          className="flex items-center gap-1.5 text-sm text-zinc-600 hover:text-zinc-600 transition-colors mb-4"
+          className="flex items-center gap-1.5 text-sm text-zinc-600 hover:text-zinc-900 transition-colors mb-4"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Tasks
@@ -191,9 +205,6 @@ export default function TaskDetailPage() {
               <p className="text-2xl font-bold text-zinc-900">
                 {formatTokenAmount(escrow.amount, escrow.token)}
               </p>
-              <p className="text-[11px] text-zinc-600 font-mono">
-                {escrow.amount.toLocaleString()} Kelvins
-              </p>
             </div>
           </div>
           <CountdownTimer deadline={escrow.deadline} />
@@ -237,7 +248,16 @@ export default function TaskDetailPage() {
               Escrow Details
             </h3>
             <div className="divide-y divide-zinc-200">
-              <InfoRow icon={Hash} label="PDA" value={escrow.pda} mono copyable copiedField={copiedField} onCopy={copy} />
+              <InfoRow icon={Hash} label="Escrow ID" value={escrow.id} mono copyable copiedField={copiedField} onCopy={copy} />
+              {escrow.txHash && (
+                <InfoRow 
+                  icon={ExternalLink} 
+                  label="Transaction" 
+                  value={`${escrow.txHash.slice(0, 10)}...${escrow.txHash.slice(-8)}`} 
+                  mono 
+                  link={getExplorerTxUrl(escrow.txHash)} 
+                />
+              )}
               <InfoRow icon={User} label="Employer" value={escrow.employer} mono copyable copiedField={copiedField} onCopy={copy} />
               <InfoRow icon={User} label="Performer" value={escrow.performer} mono copyable copiedField={copiedField} onCopy={copy} />
               <InfoRow icon={Globe} label="Judge Endpoint" value={escrow.judgeEndpoint} />

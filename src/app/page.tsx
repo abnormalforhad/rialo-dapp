@@ -19,7 +19,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-[0.65rem] uppercase tracking-[0.4em] font-bold mb-8 text-[#1A1A1A]/60"
           >
-            With Programmable Privacy for Modern Finance
+            Autonomous AI Agent Escrow on Ethereum Sepolia
           </motion.p>
           
           <motion.h1 
@@ -28,7 +28,7 @@ export default function LandingPage() {
             transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="text-5xl md:text-8xl font-medium tracking-tight mb-16 max-w-5xl mx-auto leading-[1.05]"
           >
-            The only network designed for <span className="italic font-serif">real applications</span>
+            The only platform designed for <span className="italic font-serif">real AI coordination</span>
           </motion.h1>
 
           <motion.div 
@@ -57,10 +57,10 @@ export default function LandingPage() {
             className="grid grid-cols-2 md:grid-cols-4 items-center justify-center gap-y-12 mt-32 border-t border-black/10 pt-16 relative"
           >
             {[
-              { label: "FINALITY", value: "0.13s" },
-              { label: "BLOCK TIME", value: "0.05s" },
-              { label: "EXECUTION TPS", value: "1M+ TPS" },
-              { label: "REACTION TIME", value: "0.000001s" },
+              { label: "NETWORK", value: "Sepolia" },
+              { label: "PROTOCOL", value: "A2A" },
+              { label: "ESCROW TYPE", value: "Smart Contract" },
+              { label: "JUDGE AI", value: "Gemini 2.5" },
             ].map((stat, i) => (
               <div key={i} className="flex flex-col items-center gap-3 relative px-4">
                 <span className="text-3xl md:text-5xl font-medium tracking-tighter tabular-nums">{stat.value}</span>
@@ -76,10 +76,10 @@ export default function LandingPage() {
       <section className="py-32 border-t border-black/10 bg-[#E1DBD0]/30">
         <div className="container mx-auto px-6">
           <div className="max-w-3xl">
-            <h2 className="text-3xl font-medium tracking-tight mb-6">Designed for high-fidelity coordination.</h2>
+            <h2 className="text-3xl font-medium tracking-tight mb-6">Designed for high-fidelity AI coordination.</h2>
             <p className="text-lg text-[#1A1A1A]/60 leading-relaxed mb-12">
-              RialoAgent provides the plumbing for autonomous agents to negotiate, work, and settle without human or middleman intervention. 
-              Built on the Rialo L1 with native HTTPS calls and protocol-level timers.
+              RialoAgent provides the infrastructure for autonomous agents to negotiate, work, and settle without human or middleman intervention. 
+              Built on Ethereum Sepolia with smart contract escrows and the Google A2A protocol.
             </p>
             <div className="flex items-center gap-6">
               <div className="p-4 bg-white/50 border border-black/5 rounded-sm">
@@ -87,7 +87,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <h4 className="font-bold text-[0.7rem] uppercase tracking-widest mb-1">On-Chain Escrows</h4>
-                <p className="text-sm text-[#1A1A1A]/50">Every Kelvins is secured by a PDA-based contract logic.</p>
+                <p className="text-sm text-[#1A1A1A]/50">Every ETH payment is secured by smart contract logic on Sepolia.</p>
               </div>
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function LandingPage() {
       <footer className="py-12 border-t border-black/10 text-center">
         <div className="container mx-auto px-6">
           <p className="text-[0.6rem] uppercase tracking-[0.3em] font-bold text-[#1A1A1A]/40">
-            © 2026 Rialo L1 • Powered by A2A Protocol
+            © 2026 RialoAgent • Powered by A2A Protocol • Ethereum Sepolia
           </p>
         </div>
       </footer>

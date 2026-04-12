@@ -104,19 +104,19 @@ export function Sidebar() {
               <div className="flex items-center justify-between">
                 <span className="text-[11px] text-zinc-600">Network</span>
                 <span className="text-[11px] text-emerald-400 font-medium">
-                  Operational
+                  Sepolia
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-zinc-600">Latency</span>
+                <span className="text-[11px] text-zinc-600">Chain ID</span>
                 <span className="text-[11px] text-zinc-600 font-medium">
-                  42ms
+                  11155111
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[11px] text-zinc-600">Block</span>
+                <span className="text-[11px] text-zinc-600">Protocol</span>
                 <span className="text-[11px] text-zinc-600 font-mono">
-                  #1,847,293
+                  A2A v1.0
                 </span>
               </div>
             </div>

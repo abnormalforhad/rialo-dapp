@@ -2,27 +2,24 @@
 
 import { useWallet } from "@/hooks/use-wallet";
 import { WalletIcon, RefreshCw, Loader2 } from "lucide-react";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
-export function KelvinBalance() {
-  const { isConnected, nativeBalance, tokenBalances, balanceLoading, refreshBalance } = useWallet();
+export function EthBalance() {
+  const { isConnected, tokenBalances, balanceLoading, refreshBalance } = useWallet();
 
   if (!isConnected) return null;
-
-  const solUiAmount = nativeBalance / LAMPORTS_PER_SOL;
 
   return (
     <div className="rounded-2xl border border-zinc-200/60 shadow-sm backdrop-blur-md bg-white/60 p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xs font-bold tracking-wider text-zinc-500 uppercase flex items-center gap-2">
           <WalletIcon className="h-4 w-4" />
-          Wallet Balances
+          Wallet Balance
         </h3>
         <button
-          onClick={refreshBalance}
+          onClick={() => refreshBalance()}
           disabled={balanceLoading}
           className="text-zinc-400 hover:text-zinc-700 transition-colors p-1 rounded-lg hover:bg-zinc-100"
-          title="Refresh balances"
+          title="Refresh balance"
         >
           {balanceLoading ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -32,19 +29,10 @@ export function KelvinBalance() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-        {/* Native SOL always first */}
-        <TokenCard
-          symbol="SOL"
-          icon="◎"
-          uiAmount={solUiAmount}
-          name="Solana"
-        />
-
-        {/* ALL SPL tokens */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {tokenBalances.map((token) => (
           <TokenCard
-            key={token.mint}
+            key={token.symbol}
             symbol={token.symbol}
             icon={token.icon}
             uiAmount={token.uiAmount}
@@ -54,7 +42,7 @@ export function KelvinBalance() {
 
         {tokenBalances.length === 0 && !balanceLoading && (
           <div className="col-span-full flex items-center justify-center py-3 text-xs text-zinc-400">
-            No SPL tokens found in this wallet
+            No balance data available
           </div>
         )}
       </div>

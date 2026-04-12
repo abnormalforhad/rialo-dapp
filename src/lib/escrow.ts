@@ -1,7 +1,7 @@
 /**
- * Escrow Contract Client
- * High-level API for interacting with the on-chain escrow program.
- * Uses demo data with mock state management for the prototype.
+ * Escrow Service
+ * Manages escrow tasks using localStorage for persistence
+ * and wagmi/viem for Sepolia ETH transactions.
  */
 
 import type {
@@ -10,28 +10,19 @@ import type {
   EscrowEvent,
 } from "@/types/escrow";
 import { EscrowStatus } from "@/types/escrow";
-import {
-  deriveEscrowPDA,
-  buildFundTaskTx,
-  buildSubmitWorkTx,
-  parseTokenAmount,
-  getRialoClient,
-} from "./rialo";
-// import { sendToJudge, parseJudgeVerdict } from "./a2a";
-import { DEFAULT_JUDGE_ENDPOINT, ESCROW_PROGRAM_ID } from "./constants";
-import { deserializeEscrowAccount } from "@/contracts/escrow/state";
+import { parseEthToWei } from "./eth-utils";
+import { DEFAULT_JUDGE_ENDPOINT } from "./constants";
 
-/* ── In-memory demo state ───────────────────────────────────────────── */
+/* ── Event system ───────────────────────────────────────────────────── */
 
-let _escrows: EscrowAccount[] = [];
-let _nonce = 0;
 const _listeners: Set<(e: EscrowEvent) => void> = new Set();
 
 function emit(event: EscrowEvent) {
   _listeners.forEach((fn) => fn(event));
 }
 
-// Generate SHA-256 hash (browser-compatible)
+/* ── SHA-256 hash (browser-compatible) ──────────────────────────────── */
+
 async function hashPrompt(text: string): Promise<string> {
   if (typeof crypto !== "undefined" && crypto.subtle) {
     const buf = await crypto.subtle.digest(
@@ -50,157 +41,88 @@ async function hashPrompt(text: string): Promise<string> {
   return Math.abs(hash).toString(16).padStart(16, "0");
 }
 
-/* ── Seed demo data ─────────────────────────────────────────────────── */
+/* ── LocalStorage persistence ───────────────────────────────────────── */
 
+const STORAGE_KEY = "rialo_escrows";
 
-/* ── Metadata Persistence (LocalStorage) ────────────────────────────── */
-
-const METADATA_KEY = "rialo_escrow_metadata";
-
-function getLocalMetadata(): Record<string, Record<string, unknown>> {
-  if (typeof window === "undefined") return {};
+function loadEscrows(): EscrowAccount[] {
+  if (typeof window === "undefined") return [];
   try {
-    const saved = localStorage.getItem(METADATA_KEY);
-    return saved ? JSON.parse(saved) : {};
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [];
   } catch {
-    return {};
+    return [];
   }
 }
 
-function saveLocalMetadata(pda: string, metadata: Record<string, unknown>) {
+function saveEscrows(escrows: EscrowAccount[]) {
   if (typeof window === "undefined") return;
-  const current = getLocalMetadata();
-  current[pda] = { ...(current[pda] || {}), ...metadata };
-  localStorage.setItem(METADATA_KEY, JSON.stringify(current));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(escrows));
 }
 
-function seedDemoData() {
-  // Clear mock array — now using RPC + local metadata
-  _escrows = [];
+function generateId(): string {
+  return `esc-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
-
-// Initialize demo data
-seedDemoData();
 
 /* ── Public API ──────────────────────────────────────────────────────── */
 
 export async function getEscrows(): Promise<EscrowAccount[]> {
-  const client = await getRialoClient();
-  const accounts = await client.getProgramAccounts(ESCROW_PROGRAM_ID);
-  
-  const fetched = accounts.map(({ pubkey, account }) => {
-    // Decode base64 data to Uint8Array
-    const binaryData = Uint8Array.from(atob(account.data), c => c.charCodeAt(0));
-    const decoded = deserializeEscrowAccount(binaryData);
-    const localMeta = getLocalMetadata()[pubkey] || {};
-    
-    return {
-      ...decoded,
-      id: pubkey.slice(-8), // Simplified id for display
-      pda: pubkey,
-      promptText: (localMeta.promptText as string) || "Original prompt stored on-chain as hash: " + decoded.promptHash.slice(0, 8),
-      workSubmissionUri: decoded.workUri,
-      judgeReasoning: decoded.judgeVerdict === null ? null : (decoded.judgeVerdict ? "Evaluation met all criteria." : "Required standards not achieved."),
-      token: "SOL",
-    } as EscrowAccount;
-  });
-
-  // Merge the simulated local tasks with the fetched ones so the frontend always shows the tasks we just created!
-  const allMap = new Map<string, EscrowAccount>();
-  
-  // Load any simulated escrows from LocalStorage unconditionally!
-  const localMetas = getLocalMetadata();
-  for (const key of Object.keys(localMetas)) {
-    if (localMetas[key].fullEscrow) {
-      const e = localMetas[key].fullEscrow as EscrowAccount;
-      allMap.set(e.id, e);
-    }
-  }
-
-  // Then override with real chained data if found
-  for (const e of fetched) allMap.set(e.id, e);
-
-  return Array.from(allMap.values()).sort((a, b) => b.createdAt - a.createdAt);
+  return loadEscrows().sort((a, b) => b.createdAt - a.createdAt);
 }
 
 export async function getEscrow(id: string): Promise<EscrowAccount | null> {
-  const client = await getRialoClient();
-  const info = await client.getAccountInfo(id);
-  if (!info) return null;
-
-  const binaryData = Uint8Array.from(atob(info.data), c => c.charCodeAt(0));
-  const decoded = deserializeEscrowAccount(binaryData);
-  const localMeta = getLocalMetadata()[id] || {};
-
-  return {
-    ...decoded,
-    id: id.slice(-8),
-    pda: id,
-    promptText: (localMeta.promptText as string) || "Task ID: " + id, 
-    workSubmissionUri: decoded.workUri,
-    judgeReasoning: decoded.judgeVerdict === null ? null : (decoded.judgeVerdict ? "Evaluation met all criteria." : "Required standards not achieved."),
-    token: "SOL",
-  } as EscrowAccount;
+  const escrows = loadEscrows();
+  return escrows.find((e) => e.id === id) ?? null;
 }
 
 export async function getEscrowsByEmployer(
   employer: string
 ): Promise<EscrowAccount[]> {
   const all = await getEscrows();
-  return all.filter((e) => e.employer === employer);
+  return all.filter((e) => e.employer.toLowerCase() === employer.toLowerCase());
 }
 
 export async function getEscrowsByPerformer(
   performer: string
 ): Promise<EscrowAccount[]> {
   const all = await getEscrows();
-  return all.filter((e) => e.performer === performer);
+  return all.filter((e) => e.performer.toLowerCase() === performer.toLowerCase());
 }
 
 export async function createTask(
   employer: string,
   params: CreateTaskParams,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sendTransaction?: (tx: any, connection: any) => Promise<string>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  connection?: any
+  sendTransaction?: (args: { to: `0x${string}`; value: bigint }) => Promise<string>
 ): Promise<EscrowAccount> {
-  _nonce++;
-  const pda = deriveEscrowPDA(employer, _nonce + 100);
+  const id = generateId();
   const promptHash = await hashPrompt(params.promptText);
   const now = Math.floor(Date.now() / 1000);
-  const amountNative = parseTokenAmount(params.amount, params.token);
+  const weiAmount = parseEthToWei(params.amount);
 
-  // Build the on-chain transaction
-  const tx = await buildFundTaskTx({
-    employer,
-    performer: params.performer,
-    judgeEndpoint: params.judgeEndpoint || DEFAULT_JUDGE_ENDPOINT,
-    amount: amountNative,
-    promptHash,
-    deadlineSeconds: params.deadlineSeconds,
-    token: params.token,
-  });
+  let txHash: string | null = null;
 
-  // If a real signer is provided, broadcast to the chain
-  if (sendTransaction && connection) {
+  // Send real ETH transaction on Sepolia if signer available
+  if (sendTransaction) {
     try {
-      const signature = await sendTransaction(tx, connection);
-      console.log("Task creation transaction sent:", signature);
+      txHash = await sendTransaction({
+        to: params.performer as `0x${string}`,
+        value: BigInt(weiAmount),
+      });
+      console.log("Task creation tx sent:", txHash);
     } catch (err) {
-      console.error("Failed to broadcast transaction:", err);
+      console.error("Failed to send transaction:", err);
       throw err;
     }
   }
 
   const escrow: EscrowAccount = {
-    id: pda.slice(-8),
-    pda,
+    id,
+    txHash,
     employer,
     performer: params.performer,
     judgeEndpoint: params.judgeEndpoint || DEFAULT_JUDGE_ENDPOINT,
-    amount: amountNative,
-    token: params.token,
+    amount: weiAmount,
+    token: "ETH",
     promptHash,
     promptText: params.promptText,
     deadline: now + params.deadlineSeconds,
@@ -209,24 +131,17 @@ export async function createTask(
     workSubmissionUri: null,
     judgeVerdict: null,
     judgeReasoning: null,
-    bump: 255 - _nonce,
   };
 
-  // Persist metadata locally so we have the promptText even if the chain only has the hash
-  // By saving the full object, we guarantee it appears in the dashboard even if the on-chain indexer is slow or simulated
-  saveLocalMetadata(pda, {
-    promptText: params.promptText,
-    createdAt: now,
-    fullEscrow: escrow,
-  });
-
-  _escrows = [escrow, ..._escrows];
+  // Persist to localStorage
+  const existing = loadEscrows();
+  saveEscrows([escrow, ...existing]);
 
   emit({
     type: "status_change",
     escrowId: escrow.id,
     timestamp: now,
-    data: { status: EscrowStatus.Funded, amount: amountNative, token: params.token },
+    data: { status: EscrowStatus.Funded, amount: weiAmount, token: "ETH" },
   });
 
   return escrow;
@@ -234,35 +149,19 @@ export async function createTask(
 
 export async function submitWork(
   escrowId: string,
-  performer: string,
-  workUri: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  sendTransaction?: (tx: any, connection: any) => Promise<string>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  connection?: any
+  _performer: string,
+  workUri: string
 ): Promise<EscrowAccount> {
-  const escrow = _escrows.find((e) => e.id === escrowId);
+  const escrows = loadEscrows();
+  const escrow = escrows.find((e) => e.id === escrowId);
   if (!escrow) throw new Error("Escrow not found");
   if (escrow.status !== EscrowStatus.Funded)
     throw new Error("Escrow not in Funded state");
 
-  const tx = await buildSubmitWorkTx({
-    escrowPda: escrow.pda,
-    performer,
-    workUri,
-  });
-
-  if (sendTransaction && connection) {
-    await sendTransaction(tx, connection);
-  }
-
   escrow.workSubmissionUri = workUri;
   escrow.status = EscrowStatus.WorkSubmitted;
 
-  // Persist the state change in localStorage
-  saveLocalMetadata(escrow.pda, {
-    fullEscrow: escrow,
-  });
+  saveEscrows(escrows);
 
   emit({
     type: "status_change",
@@ -295,15 +194,17 @@ export async function getStats() {
   const completed = escrows.filter((e) =>
     [EscrowStatus.Released, EscrowStatus.Approved].includes(e.status)
   );
-  const totalLocked = active.reduce((sum, e) => sum + e.amount, 0);
-  const totalReleased = completed.reduce((sum, e) => sum + e.amount, 0);
+
+  // Sum amounts as bigints to avoid precision loss
+  const totalLocked = active.reduce((sum, e) => sum + BigInt(e.amount), 0n);
+  const totalReleased = completed.reduce((sum, e) => sum + BigInt(e.amount), 0n);
 
   return {
     totalTasks: escrows.length,
     activeTasks: active.length,
     completedTasks: completed.length,
-    totalLocked,
-    totalReleased,
+    totalLocked: totalLocked.toString(),
+    totalReleased: totalReleased.toString(),
     successRate:
       escrows.length > 0
         ? Math.round((completed.length / escrows.length) * 100)

@@ -11,15 +11,13 @@ export enum EscrowStatus {
   Cancelled = "cancelled",
 }
 
-
-
 export interface EscrowAccount {
   id: string;
-  pda: string;
-  employer: string;
-  performer: string;
+  txHash: string | null; // Sepolia transaction hash
+  employer: string; // 0x address
+  performer: string; // 0x address
   judgeEndpoint: string;
-  amount: number; // in Kelvins
+  amount: string; // wei as string (bigint-safe)
   promptHash: string;
   promptText: string;
   deadline: number; // unix timestamp
@@ -28,14 +26,13 @@ export interface EscrowAccount {
   workSubmissionUri: string | null;
   judgeVerdict: boolean | null;
   judgeReasoning: string | null;
-  token?: string;
-  bump: number;
+  token: string; // always "ETH" for Sepolia
 }
 
 export interface CreateTaskParams {
   performer: string;
   judgeEndpoint: string;
-  amount: number;
+  amount: number; // human-readable ETH amount (e.g. 0.01)
   token: string;
   promptText: string;
   deadlineSeconds: number;

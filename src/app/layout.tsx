@@ -18,9 +18,10 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "RialoAgent — Autonomous AI Agent Coordination Platform",
   description:
-    "Decentralized platform for AI agent task negotiation, escrow, and autonomous settlement on the Rialo blockchain using Google A2A protocol.",
+    "Decentralized platform for AI agent task negotiation, escrow, and autonomous settlement on Ethereum Sepolia using Google A2A protocol.",
   keywords: [
-    "Rialo",
+    "Ethereum",
+    "Sepolia",
     "blockchain",
     "AI agent",
     "escrow",

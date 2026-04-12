@@ -4,9 +4,8 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useWallet } from "@/hooks/use-wallet";
-import { useConnection } from "@solana/wallet-adapter-react";
 import { createTask } from "@/lib/escrow";
-import { DEFAULT_JUDGE_ENDPOINT } from "@/lib/constants";
+import { DEFAULT_JUDGE_ENDPOINT, SEPOLIA_CHAIN_ID } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,7 +26,6 @@ import {
   Wallet,
   CheckCircle2,
 } from "lucide-react";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 const DEADLINE_OPTIONS = [
   { value: "1800", label: "30 Minutes" },
@@ -40,15 +38,9 @@ const DEADLINE_OPTIONS = [
   { value: "604800", label: "7 Days" },
 ];
 
-// Base token options (always shown)
-const BASE_TOKEN_OPTIONS = [
-  { value: "SOL", label: "SOL (Solana)", icon: "◎" },
-];
-
 export function TaskCreationForm() {
   const router = useRouter();
-  const { publicKey, isConnected, sendTransaction, tokenBalances, nativeBalance, evmConnected, evmAddress, sendEvmTransaction, evmChainId, evmSwitchChain } = useWallet();
-  const { connection } = useConnection();
+  const { address, isConnected, sendTransaction, connect, chainId, switchChain, balance } = useWallet();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -56,106 +48,60 @@ export function TaskCreationForm() {
     promptText: "",
     performer: "",
     amount: "",
-    token: "SOL",
+    token: "ETH",
     deadlineSeconds: "7200",
     judgeEndpoint: DEFAULT_JUDGE_ENDPOINT,
   });
 
-  // Build dynamic token options from wallet balances
-  const tokenOptions = useMemo(() => {
-    const options = [...BASE_TOKEN_OPTIONS];
-    
-    // Add all SPL tokens from wallet
-    for (const token of tokenBalances) {
-      // Skip if already in base options
-      if (options.some(o => o.value === token.symbol)) continue;
-      options.push({
-        value: token.symbol,
-        label: `${token.symbol} (${token.uiAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })})`,
-        icon: token.icon,
-      });
-    }
-    
-    return options;
-  }, [tokenBalances]);
-
-  // Get balance for selected token
-  const selectedTokenBalance = useMemo(() => {
-    if (form.token === "SOL") {
-      return nativeBalance / LAMPORTS_PER_SOL;
-    }
-    const token = tokenBalances.find(t => t.symbol === form.token);
-    return token?.uiAmount ?? 0;
-  }, [form.token, tokenBalances, nativeBalance]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const isEvmToken = form.token === "ETH";
-    const activeAddress = isEvmToken ? evmAddress : publicKey;
-    const isReady = isEvmToken ? evmConnected : isConnected;
 
-    if (!isReady || !activeAddress) {
-      alert(`Please connect your ${isEvmToken ? "EVM" : "Solana"} wallet to use ${form.token}!`);
+    if (!isConnected || !address) {
+      alert("Please connect your wallet first!");
       return;
     }
 
-    // Address Validations
-    if (isEvmToken && !/^0x[a-fA-F0-9]{40}$/.test(form.performer)) {
-      alert("Invalid Address: You are using the Ethereum network. Please enter a valid EVM address (0x...) for the AI Performer Agent.");
-      return;
-    }
-
-    if (!isEvmToken && (form.performer.length < 32 || form.performer.length > 44 || form.performer.startsWith('0x'))) {
-      alert("Invalid Address: You are using the Solana network. Please enter a valid Solana Base58 public key for the AI Performer Agent.");
+    // Validate performer address
+    if (!/^0x[a-fA-F0-9]{40}$/.test(form.performer)) {
+      alert("Invalid Address: Please enter a valid Ethereum address (0x...) for the AI Performer Agent.");
       return;
     }
 
     setLoading(true);
     try {
-      
-      let txSender = sendTransaction;
-      let txConnection = connection;
-
-      if (isEvmToken) {
-        // Enforce Sepolia testnet only so users don't accidentally burn real Mainnet ETH
-        const SEPOLIA_CHAIN_ID = 11155111;
-        if (evmChainId !== SEPOLIA_CHAIN_ID && evmSwitchChain) {
-          try {
-            await evmSwitchChain({ chainId: SEPOLIA_CHAIN_ID });
-          } catch (switchError) {
-            console.error("Network switch declined or failed", switchError);
-            alert("To proceed, please authorize switching MetaMask to the Sepolia test network.");
-            setLoading(false);
-            return;
-          }
+      // Enforce Sepolia testnet
+      if (chainId !== SEPOLIA_CHAIN_ID && switchChain) {
+        try {
+          await switchChain({ chainId: SEPOLIA_CHAIN_ID });
+        } catch (switchError) {
+          console.error("Network switch declined or failed", switchError);
+          alert("To proceed, please authorize switching to the Sepolia test network.");
+          setLoading(false);
+          return;
         }
-
-        // Mock a Solana-like sender for escrow.ts which just wraps wagmi for EVM!
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        txSender = async (tx: any) => {
-          const hash = await sendEvmTransaction(tx);
-          return hash;
-        };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        txConnection = "evm" as any;
       }
 
-      const task = await createTask(activeAddress, {
+      // Create the task with real ETH transaction
+      const txSender = async (args: { to: `0x${string}`; value: bigint }) => {
+        const hash = await sendTransaction(args);
+        return hash;
+      };
+
+      const task = await createTask(address, {
         promptText: form.promptText,
         performer: form.performer,
         amount: parseFloat(form.amount),
-        token: form.token,
+        token: "ETH",
         deadlineSeconds: parseInt(form.deadlineSeconds),
         judgeEndpoint: form.judgeEndpoint,
-      }, txSender, txConnection);
+      }, txSender);
 
       setSuccess(true);
       setTimeout(() => {
-        router.push(`/dashboard/tasks/${task.pda}`);
+        router.push(`/dashboard/tasks/${task.id}`);
       }, 2000);
     } catch (err: unknown) {
       console.error("Failed to create task:", err);
-      // Try to extract an error message safely
       const errorMessage = err instanceof Error ? err.message : String(err);
       alert("Deployment failed: " + (errorMessage || "Check console for details"));
     } finally {
@@ -182,7 +128,7 @@ export function TaskCreationForm() {
           Escrow Funded Successfully
         </h3>
         <p className="text-base text-zinc-600">
-          Agent has been notified. Redirecting to task dashboard...
+          Transaction sent to Sepolia. Redirecting to task dashboard...
         </p>
       </motion.div>
     );
@@ -214,7 +160,7 @@ export function TaskCreationForm() {
             AI Performer Agent Address
           </label>
           <Input
-            placeholder="Agent Solana Public Key..."
+            placeholder="0x..."
             value={form.performer}
             onChange={(e) => setForm({ ...form, performer: e.target.value })}
             required
@@ -222,52 +168,32 @@ export function TaskCreationForm() {
           />
         </div>
 
-        {/* Amount & Token */}
+        {/* Amount */}
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
             <Wallet className="h-4 w-4 text-indigo-500" />
-            Funding Amount & Token
+            Funding Amount (ETH)
           </label>
           <div className="flex gap-2">
             <Input
               type="number"
-              step="0.001"
-              min="0.001"
-              placeholder="e.g. 5.0"
+              step="0.0001"
+              min="0.0001"
+              placeholder="e.g. 0.01"
               value={form.amount}
               onChange={(e) => setForm({ ...form, amount: e.target.value })}
               required
               className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500/50 rounded-xl h-12 w-full"
             />
-            <Select
-              value={form.token}
-              onValueChange={(v) => v && setForm({ ...form, token: v })}
-            >
-              <SelectTrigger className="bg-white/60 border-zinc-200/60 shadow-sm backdrop-blur-md text-zinc-900 focus:border-indigo-500/50 rounded-xl h-12 w-[160px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800 rounded-xl max-h-64">
-                {tokenOptions.map((opt) => (
-                  <SelectItem
-                    key={opt.value}
-                    value={opt.value}
-                    className="text-zinc-200 focus:bg-zinc-800 focus:text-white cursor-pointer"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span className="text-base">{opt.icon}</span>
-                      <span>{opt.value}</span>
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-2 px-4 h-12 bg-white/60 border border-zinc-200/60 rounded-xl text-zinc-700 font-bold text-sm">
+              💎 ETH
+            </div>
           </div>
-          {/* Show selected token balance */}
-          {(isConnected || evmConnected) && (
+          {isConnected && (
             <p className="text-xs text-zinc-500 mt-1">
               Available: <span className="font-semibold text-zinc-700 tabular-nums">
-                {selectedTokenBalance.toLocaleString(undefined, { maximumFractionDigits: 4 })}
-              </span> {form.token}
+                {balance.toLocaleString(undefined, { maximumFractionDigits: 4 })}
+              </span> ETH
             </p>
           )}
         </div>
@@ -278,7 +204,7 @@ export function TaskCreationForm() {
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
             <Clock className="h-4 w-4 text-indigo-500" />
-            Deadline (Native Timer)
+            Deadline
           </label>
           <Select
             value={form.deadlineSeconds}
@@ -307,7 +233,7 @@ export function TaskCreationForm() {
             Judge AI RPC Endpoint
           </label>
           <Input
-            placeholder="https://rialo.network/api/judge"
+            placeholder="/api/judge"
             value={form.judgeEndpoint}
             onChange={(e) =>
               setForm({ ...form, judgeEndpoint: e.target.value })
@@ -331,7 +257,7 @@ export function TaskCreationForm() {
                 Transaction Preview
               </h4>
               <div className="flex items-center gap-1.5 text-xs text-zinc-600 bg-white/60 px-2 py-1 rounded border border-zinc-200/60 shadow-sm backdrop-blur-md">
-                <Zap className="w-3 h-3 text-indigo-400" /> No Admin Keys
+                <Zap className="w-3 h-3 text-indigo-400" /> Sepolia Testnet
               </div>
             </div>
             
@@ -339,7 +265,7 @@ export function TaskCreationForm() {
               <div className="flex justify-between items-center py-1 border-b border-zinc-200/60">
                 <span className="text-zinc-600">Locking Amount</span>
                 <span className="text-zinc-900 font-semibold text-lg flex items-center gap-1">
-                  {form.amount} <span className="text-indigo-500 text-sm font-bold">{form.token}</span>
+                  {form.amount} <span className="text-indigo-500 text-sm font-bold">ETH</span>
                 </span>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-zinc-200/60">
@@ -360,28 +286,21 @@ export function TaskCreationForm() {
       </AnimatePresence>
 
       {/* Action Button */}
-      {(isConnected || evmConnected) ? (
+      {isConnected ? (
         <Button
           type="submit"
-          disabled={loading || !form.promptText || !form.performer || !form.amount || (form.token === "ETH" ? !evmConnected : !isConnected)}
+          disabled={loading || !form.promptText || !form.performer || !form.amount}
           className="w-full btn-minimal h-14 rounded-sm"
         >
           <span className="relative flex items-center justify-center gap-2">
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
-            {loading ? "Initializing..." : "DEPLOY ESCROW"}
+            {loading ? "Sending Transaction..." : "DEPLOY ESCROW"}
           </span>
         </Button>
       ) : (
         <Button
           type="button"
-          onClick={() => {
-            const el = document.querySelector('.wallet-adapter-button-trigger');
-            if (el) {
-              (el as HTMLButtonElement).click();
-            } else {
-              alert("Please connect your wallet in the navigation bar first.");
-            }
-          }}
+          onClick={connect}
           className="w-full bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 h-14 text-lg font-bold rounded-xl transition-all"
         >
           <Wallet className="mr-2 h-5 w-5 text-cyan-400" />

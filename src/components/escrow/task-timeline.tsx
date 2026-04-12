@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import type { EscrowAccount } from "@/types/escrow";
 import { EscrowStatus } from "@/types/escrow";
+import { formatTokenAmount } from "@/lib/eth-utils";
 import { cn } from "@/lib/utils";
 import {
   CheckCircle2,
@@ -35,7 +36,7 @@ function getTimelineSteps(escrow: EscrowAccount): TimelineStep[] {
     {
       id: "funded",
       label: "Task Funded",
-      description: `${(escrow.amount / 1e9).toFixed(2)} RIALO locked in escrow`,
+      description: `${formatTokenAmount(escrow.amount, escrow.token)} locked in escrow`,
       icon: <Coins className="h-4 w-4" />,
       status: "completed",
     },
