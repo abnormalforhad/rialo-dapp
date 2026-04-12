@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar } from "@/components/layout/navbar";
 import { AppWalletProvider } from "@/components/wallet/wallet-provider";
@@ -45,6 +46,7 @@ export default function RootLayout({
           <AppWalletProvider>
             <Navbar />
             <main className="flex-1">{children}</main>
+            <Toaster position="bottom-right" richColors closeButton theme="light" />
           </AppWalletProvider>
         </TooltipProvider>
       </body>

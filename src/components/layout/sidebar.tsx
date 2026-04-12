@@ -9,6 +9,7 @@ import {
   PlusCircle,
   ListChecks,
   Bot,
+  History,
   Activity,
   X,
 } from "lucide-react";
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/create", label: "Create Task", icon: PlusCircle },
   { href: "/dashboard/tasks", label: "Active Tasks", icon: ListChecks },
+  { href: "/dashboard/history", label: "History", icon: History },
   { href: "/dashboard/agents", label: "AI Agents", icon: Bot },
 ];
 

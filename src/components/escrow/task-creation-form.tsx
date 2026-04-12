@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import { useWallet } from "@/hooks/use-wallet";
 import { createTask } from "@/lib/escrow";
 import { DEFAULT_JUDGE_ENDPOINT, SEPOLIA_CHAIN_ID } from "@/lib/constants";
@@ -57,13 +58,15 @@ export function TaskCreationForm() {
     e.preventDefault();
 
     if (!isConnected || !address) {
-      alert("Please connect your wallet first!");
+      toast.error("Please connect your wallet first");
       return;
     }
 
     // Validate performer address
     if (!/^0x[a-fA-F0-9]{40}$/.test(form.performer)) {
-      alert("Invalid Address: Please enter a valid Ethereum address (0x...) for the AI Performer Agent.");
+      toast.error("Invalid Address", {
+        description: "Please enter a valid Ethereum address (0x...) for the AI Performer Agent.",
+      });
       return;
     }
 
@@ -75,7 +78,9 @@ export function TaskCreationForm() {
           await switchChain({ chainId: SEPOLIA_CHAIN_ID });
         } catch (switchError) {
           console.error("Network switch declined or failed", switchError);
-          alert("To proceed, please authorize switching to the Sepolia test network.");
+          toast.error("Network Switch Required", {
+            description: "Please authorize switching to the Sepolia test network.",
+          });
           setLoading(false);
           return;
         }
@@ -97,13 +102,19 @@ export function TaskCreationForm() {
       }, txSender);
 
       setSuccess(true);
+      toast.success("Escrow Funded Successfully!", {
+        description: `Task ${task.id} created. Redirecting...`,
+        duration: 3000,
+      });
       setTimeout(() => {
         router.push(`/dashboard/tasks/${task.id}`);
       }, 2000);
     } catch (err: unknown) {
       console.error("Failed to create task:", err);
       const errorMessage = err instanceof Error ? err.message : String(err);
-      alert("Deployment failed: " + (errorMessage || "Check console for details"));
+      toast.error("Deployment Failed", {
+        description: errorMessage || "Check console for details",
+      });
     } finally {
       setLoading(false);
     }

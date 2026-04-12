@@ -26,6 +26,7 @@ import {
   Globe,
   Clock,
   Gavel,
+  Send,
   Zap,
 } from "lucide-react";
 
@@ -185,6 +186,15 @@ export default function TaskDetailPage() {
           >
             {STATUS_LABELS[escrow.status]}
           </Badge>
+          {escrow.status === EscrowStatus.Funded && (
+            <Button
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0 shadow-lg shadow-indigo-500/25"
+              onClick={() => router.push(`/dashboard/tasks/${escrow.id}/submit`)}
+            >
+              <Send className="mr-2 h-4 w-4" />
+              Submit Work
+            </Button>
+          )}
         </div>
       </motion.div>
 
