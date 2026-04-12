@@ -67,9 +67,9 @@ export function useWallet() {
   const connectWallet = useCallback(async () => {
     // Force the wallet to show the account picker every time
     // instead of silently reconnecting to the last account
-    if (typeof window !== "undefined" && window.ethereum) {
+    if (typeof window !== "undefined" && (window as any).ethereum) {
       try {
-        await window.ethereum.request({
+        await (window as any).ethereum.request({
           method: "wallet_requestPermissions",
           params: [{ eth_accounts: {} }],
         });
